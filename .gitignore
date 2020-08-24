@@ -1,0 +1,48 @@
+# javascript specific
+node_modules
+
+# scala specific
+*.class
+*.log
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# intellij
+.idea/
+*.ipr
+*.iml
+
+# Scala IDE specific
+.scala_dependencies
+.worksheet
+
+# Visual Studio Code specific
+.bloop/
+.metals/
+project/metals.sbt
+.history/
+.vscode/
+
+# environment specific
+.envrc
+
+# Mac files
+.DS_Store
+
+
+# deployment secrets
+devel.secrets.json
+/dashboard/certs/
+/docker/dashboard/dependencies/certs
+
+build.sbt.repl
+build.sbt.original
