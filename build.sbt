@@ -1,9 +1,8 @@
 ThisBuild / scalaVersion     := "2.13.3"
 ThisBuild / organization := "com.intenthq"
-
-homepage := Some(url("https://github.com/intenthq/hybrid-processor-integrations"))
-developers := List(Developer("intenthq", "Intent HQ", null, null))
-licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT")))
+ThisBuild / homepage := Some(url("https://github.com/intenthq/hybrid-processor-integrations"))
+ThisBuild / developers := List(Developer("intenthq", "Intent HQ", null, null))
+ThisBuild / licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT")))
 
 lazy val root = (project in file("."))
   .settings(
