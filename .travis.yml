@@ -18,7 +18,7 @@ jobs:
     - stage: test
       script: sbt ++$TRAVIS_SCALA_VERSION test
     - stage: release
-      script: sbt ++$TRAVIS_SCALA_VERSION version
+      script: sbt ci-release
 
 before_cache:
   - rm -fv $HOME/.ivy2/.sbt.ivy.lock
