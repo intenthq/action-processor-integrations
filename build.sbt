@@ -1,5 +1,6 @@
 ThisBuild / scalaVersion     := "2.13.3"
 ThisBuild / organization := "com.intenthq"
+ThisBuild / skip in publish := true
 
 lazy val root = (project in file("."))
   .settings(
