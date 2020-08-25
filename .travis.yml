@@ -16,10 +16,10 @@ stages:
 jobs:
   include:
     - stage: test
-      script: sbt test
+      script: sbt ++$TRAVIS_SCALA_VERSION test
     - stage: release
       script: echo "Release 1"
-      script: sbt version
+      script: sbt ++$TRAVIS_SCALA_VERSION version
 
 before_cache:
   - rm -fv $HOME/.ivy2/.sbt.ivy.lock
