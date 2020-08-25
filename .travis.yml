@@ -18,7 +18,6 @@ jobs:
     - stage: test
       script: sbt ++$TRAVIS_SCALA_VERSION test
     - stage: release
-      script: echo "Release 1"
       script: sbt ++$TRAVIS_SCALA_VERSION version
 
 before_cache:
