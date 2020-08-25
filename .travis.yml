@@ -9,21 +9,17 @@ before_install:
   - git fetch --tags
 
 stages:
-  - name: compile
   - name: test
   - name: release
     if: tag IS present AND NOT fork
 
 jobs:
   include:
-    # stage="test" if no stage is specified
-    - stage: compile
-      script: sbt compile
     - stage: test
       script: sbt test
     - stage: release
       script: echo "Release 1"
-      script: echo "Release 2"
+      script: sbt version
 
 before_cache:
   - rm -fv $HOME/.ivy2/.sbt.ivy.lock
