@@ -5,8 +5,25 @@ jdk: openjdk8
 scala:
    - 2.13.3
 
-script:
-  - sbt ++$TRAVIS_SCALA_VERSION test
+before_install:
+  - git fetch --tags
+
+stages:
+  - name: compile
+  - name: test
+  - name: release
+    if: tag IS present AND NOT fork
+
+jobs:
+  include:
+    # stage="test" if no stage is specified
+    - stage: compile
+      script: sbt compile
+    - stage: test
+      script: sbt test
+    - stage: release
+      script: echo "Release 1"
+      script: echo "Release 2"
 
 before_cache:
   - rm -fv $HOME/.ivy2/.sbt.ivy.lock
@@ -18,3 +35,4 @@ cache:
     - $HOME/.cache/coursier
     - $HOME/.ivy2/cache
     - $HOME/.sbt
+
