@@ -17,11 +17,13 @@ lazy val root = (project in file("."))
     scalafmtOnCompile := true,
     libraryDependencies ++= Seq(
       "co.fs2" %% "fs2-core" % "2.4.4",
+      "co.fs2" %% "fs2-io" % "2.4.4",
       "com.propensive" %% "magnolia" % "0.17.0",
       "de.siegmar" % "fastcsv" % "1.0.3",
       "org.mapdb" % "mapdb" % "3.0.8",
       "org.tpolecat" %% "doobie-core" % "0.9.0",
       "org.tpolecat" %% "doobie-hikari" % "0.9.0",
+      "com.google.guava" % "guava" % "30.0-jre",
       "com.disneystreaming" %% "weaver-framework" % "0.5.0" % "test",
       "com.disneystreaming" %% "weaver-scalacheck" % "0.4.3" % "test",
       "org.tpolecat" %% "doobie-h2" % "0.9.0" % "test"
