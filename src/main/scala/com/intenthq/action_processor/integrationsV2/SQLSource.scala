@@ -1,13 +1,14 @@
-package com.intenthq.hybrid.integrationsV2
+package com.intenthq.action_processor.integrationsV2
 
 import java.util.concurrent.ForkJoinPool
 
 import cats.effect.{ContextShift, IO}
+import com.intenthq.action_processor.integrations.DoobieImplicits
 import com.intenthq.hybrid.integrations.DoobieImplicits
+import com.intenthq.hybrid.integrationsV2.ProcessorContext
 import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
-import fs2._
 
 trait SQLSource[I] extends Processor with Source[I] with DoobieImplicits {
 
@@ -17,6 +18,8 @@ trait SQLSource[I] extends Processor with Source[I] with DoobieImplicits {
 
   protected def query(processorContext: ProcessorContext): Query0[I]
 
+  def serializeRow(row: I): Array[Byte]
+
   implicit private val contextShift: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
 
   protected def createTransactor: Aux[IO, Unit] = Transactor.fromDriverManager[IO](driver, jdbcUrl)
@@ -25,11 +28,11 @@ trait SQLSource[I] extends Processor with Source[I] with DoobieImplicits {
 
   protected val chunkSize: Int = doobie.util.query.DefaultChunkSize
 
-  override protected def sourceStream(processorContext: ProcessorContext): Stream[IO, I] =
+  override def stream(processorContext: ProcessorContext): fs2.Stream[IO, Array[Byte]] =
     query(processorContext)
       .streamWithChunkSize(chunkSize)
       .transact[IO](transactor)
-
+      .map(serializeRow)
 }
 
 object SQLSource {
