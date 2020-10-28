@@ -27,12 +27,16 @@ jobs:
       - id: publish-sonatype
         name: Publish Sonatype
         env:
+          TEST_MULTILINE: '${{ secrets.TEST_MULTILINE }}'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-          PGP_SECRET: "${{ secrets.PGP_SECRET }}"
+          PGP_SECRET: '${{ secrets.PGP_SECRET }}'
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         run: sbt ci-release
+      - env:
+          TEST_MULTILINE: '${{ secrets.TEST_MULTILINE }}'
+        run: echo "${{ env.TEST_MULTILINE }}"
       - name: Send slack notification
         uses: act10ns/slack@v1
         env:
