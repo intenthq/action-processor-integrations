@@ -1,4 +1,4 @@
-name: Release
+name: Release to Sonatype
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  release:
+  release-sonatype:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -35,8 +35,8 @@ jobs:
           echo $PGP_SECRET | base64 --decode | gpg --import --no-tty --batch --yes
         env:
           PGP_SECRET: ${{secrets.PGP_SECRET}}
-      - id: publish-sonatype
-        name: Publish Sonatype
+      - id: release-sonatype
+        name: Release to Sonatype
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
