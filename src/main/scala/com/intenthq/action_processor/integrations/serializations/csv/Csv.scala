@@ -1,4 +1,4 @@
-package com.intenthq.hybrid.integrations.serializations.csv
+package com.intenthq.action_processor.integrations.serializations.csv
 
 import java.time._
 

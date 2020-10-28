@@ -1,4 +1,4 @@
-package com.intenthq.hybrid.integrations
+package com.intenthq.action_processor.integrations
 
 import java.io.StringReader
 import java.nio.charset.StandardCharsets

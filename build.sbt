@@ -2,7 +2,7 @@ ThisBuild / organization := "com.intenthq"
 ThisBuild / organizationName := "Intent HQ"
 ThisBuild / organizationHomepage := Some(url("https://www.intenthq.com/"))
 
-ThisBuild / homepage := Some(url("https://github.com/intenthq/hybrid-processor-integrations"))
+ThisBuild / homepage := Some(url("https://github.com/intenthq/action-processor-integrations"))
 ThisBuild / developers := List(Developer("intenthq", "Intent HQ", null, url("https://www.intenthq.com/")))
 ThisBuild / licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT")))
 
@@ -10,7 +10,7 @@ ThisBuild / scalaVersion := "2.13.3"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "hybrid-processor-integrations",
+    name := "action-processor-integrations",
     Compile / packageDoc / mappings := Seq(),
     Compile / packageSrc / mappings := Seq(),
     testFrameworks += new TestFramework("weaver.framework.TestFramework"),

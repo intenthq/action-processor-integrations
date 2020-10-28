@@ -1,9 +1,9 @@
-package com.intenthq.hybrid.integrations
+package com.intenthq.action_processor.integrations
 
 import java.time.{Instant, LocalDate, LocalTime}
 
 import cats.effect.IO
-import com.intenthq.hybrid.integrations.serializations.csv.CsvSerialization
+import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
 import doobie.util.query.Query0
 
 case class ExampleCsvFeedRow(integer: Int,
