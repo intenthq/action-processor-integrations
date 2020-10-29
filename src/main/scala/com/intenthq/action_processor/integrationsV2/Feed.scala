@@ -1,9 +1,14 @@
 package com.intenthq.action_processor.integrationsV2
 
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
-import cats.effect.{IO, Resource}
-import doobie.util.query
+import cats.effect.{ContextShift, IO, Resource}
+import doobie.implicits.{toDoobieStreamOps, toSqlInterpolator}
+import doobie.util.query.Query0
+import doobie.util.transactor.Transactor
+import doobie.util.transactor.Transactor.Aux
+import fs2.Pipe
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -18,9 +23,9 @@ import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 object Aggregate {
 
-  def apply[I, A](feedContext: FeedContext, key: I => A, counter: I => Long): fs2.Pipe[IO, I, (A, Long)] =
+  def apply[I, K]( /*feedContext: FeedContext,*/ key: I => K, counter: I => Long): fs2.Pipe[IO, I, (K, Long)] =
     sourceStream => {
-      val repository: ConcurrentMap[A, Long] = new ConcurrentHashMap[A, Long]()
+      val repository: ConcurrentMap[K, Long] = new ConcurrentHashMap[K, Long]()
 
       def put(o: I): IO[Unit] =
         IO.delay {
@@ -28,7 +33,7 @@ object Aggregate {
           repository.put(key(o), counter(o) + previousCounter)
         }.void
 
-      def streamKeyValue: fs2.Stream[IO, (A, Long)] =
+      def streamKeyValue: fs2.Stream[IO, (K, Long)] =
         fs2.Stream
           .fromIterator[IO](
             repository
@@ -38,7 +43,7 @@ object Aggregate {
           )
           .map(e => (e.getKey, e.getValue))
 
-      fs2.Stream.resource[IO, ConcurrentMap[A, Long]](Resource.liftF(IO.delay(repository))).flatMap { _ =>
+      fs2.Stream.resource[IO, ConcurrentMap[K, Long]](Resource.liftF(IO.delay(repository))).flatMap { _ =>
         sourceStream.evalMap { i =>
           put(i)
         }.drain ++ streamKeyValue
@@ -48,8 +53,8 @@ object Aggregate {
 
 trait Feed[I, A] {
   def inputStream(feedContext: FeedContext): fs2.Stream[IO, I]
-  def transform(feedContext: FeedContext): fs2.Pipe[IO, I, (A, Long)]
-  def serialize(a: (A, Long)): Array[Byte]
+  def transform(feedContext: FeedContext): fs2.Pipe[IO, I, A]
+  def serialize(a: A): Array[Byte]
 
   final def stream(processorContext: FeedContext): fs2.Stream[IO, Array[Byte]] =
     inputStream(processorContext)
@@ -57,52 +62,56 @@ trait Feed[I, A] {
       .map(serialize)
 }
 
-//object Main {
-//  def main(args: Array[String]): Unit = {
-//    class A extends Processor with Aggregations[Int] {
-//      override protected def sourceStream(processorContext: ProcessorContext): Stream[IO, Int] = fs2.Stream(1, 2, 3, 4)
-////      override val repository: ConcurrentMap[String, Long] = new ConcurrentHashMap[String, Long]()
-//      override def key(a: Int): String = a.toString
-//      override def value(a: Int): Long = 1L
-//      override def serializeAggregatedKV(o2: (String, Long)): Array[Byte] = s"${o2._1},${o2._2}".getBytes(StandardCharsets.UTF_8)
-//    }
-//  }
-//}
+abstract class SQLFeed[I, O] extends Feed[I, O] {
+  protected val jdbcUrl: String
 
-//object Main2 {
-//  def main(args: Array[String]): Unit = {
-//    class A extends Processor {
-//      override protected def stream(processorContext: FeedContext): fs2.Stream[IO, Array[Byte]] =
-//        fs2.Stream(1, 2, 3, 4, 5).map(_.toString.getBytes)
-//    }
-//  }
-//}
-//
-//object Main3 {
-//  def main(args: Array[String]): Unit = {
-//    class A extends Processor with HiveSource[Int] {
-//      override protected val driver: String = "Mysql"
-//      override protected val jdbcUrl: String = "jdbc://blah"
-//
-//      override protected def query(processorContext: FeedContext): query.Query0[Int] = ???
-//
-//      override def serializeRow(o2: Int): Array[Byte] = o2.toString.getBytes
-//    }
-//  }
-//}
-//
-//object Main4 {
-//  def main(args: Array[String]): Unit = {
-//    class A extends Processor with SQLSource[Int] {
-//      override protected val driver: String = "Mysql"
-//      override protected val jdbcUrl: String = "jdbc://blah"
-//
-//      override protected def query(processorContext: FeedContext): query.Query0[Int] = ???
-//
-//      override def serializeRow(o2: Int): Array[Byte] = null
-//
-//      override protected def stream(processorContext: FeedContext): Stream[IO, Array[Byte]] =
-//
-//    }
-//  }
-//}
+  protected val driver: String
+
+  protected def query(feedContext: FeedContext): Query0[I]
+
+  override def inputStream(feedContext: FeedContext): fs2.Stream[IO, I] =
+    query(feedContext)
+      .streamWithChunkSize(chunkSize)
+      .transact[IO](transactor)
+
+  implicit private val contextShift: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
+
+  protected def createTransactor: Aux[IO, Unit] = Transactor.fromDriverManager[IO](driver, jdbcUrl)
+
+  protected lazy val transactor: Transactor[IO] = createTransactor
+
+  protected val chunkSize: Int = doobie.util.query.DefaultChunkSize
+}
+
+abstract class Hive[I, O] extends SQLFeed[I, O] {
+
+  override protected val jdbcUrl: String = ""
+
+  override protected val driver: String = ""
+
+}
+
+object Main {
+  def main(args: Array[String]): Unit = {
+
+    class NoAggCase extends Hive[Int, String] {
+
+      override protected def query(feedContext: FeedContext): Query0[Int] = sql"1".query[Int]
+
+      override def transform(feedContext: FeedContext): Pipe[IO, Int, String] = s => s.map(_.toString)
+
+      override def serialize(a: String): Array[Byte] = a.getBytes(StandardCharsets.UTF_8)
+    }
+
+    class AggCase extends Hive[Int, (String, Long)] {
+
+      override protected def query(feedContext: FeedContext): Query0[Int] = sql"1".query[Int]
+
+      override def transform(feedContext: FeedContext): Pipe[IO, Int, (String, Long)] = Aggregate.apply(_.toString, _ => 1L)
+
+      override def serialize(a: (String, Long)): Array[Byte] = a._1.getBytes(StandardCharsets.UTF_8)
+    }
+
+    new AggCase().stream(new FeedContext()).compile.drain.unsafeRunSync()
+  }
+}
