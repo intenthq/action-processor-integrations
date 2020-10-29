@@ -19,7 +19,6 @@ object Csv {
   def dispatch[A](ctx: SealedTrait[Csv, A]): Csv[A] = (a: A) => ctx.dispatch(a)(sub => sub.typeclass.toCSV(sub.cast(a)))
 
   implicit def csvOpt[T: Csv]: Csv[Option[T]] = (a: Option[T]) => a.fold(Array[String](""))(Csv[T].toCSV)
-  implicit def deriveCsv[A]: Csv[A] = macro Magnolia.gen[A]
   implicit val csvStr: Csv[String] = (a: String) => Array(a)
   implicit val csvInt: Csv[Int] = (a: Int) => Array(a.toString)
   implicit val csvLong: Csv[Long] = (a: Long) => Array(a.toString)
@@ -31,4 +30,6 @@ object Csv {
   implicit val csvLocalTime: Csv[LocalTime] = (a: LocalTime) => Array(a.toString)
   implicit val csvInstant: Csv[Instant] = (a: Instant) => Array(a.toString)
   implicit val csvLocalDateTime: Csv[LocalDateTime] = (a: LocalDateTime) => Array(a.toString)
+
+  implicit def deriveCsv[A]: Csv[A] = macro Magnolia.gen[A]
 }
