@@ -8,6 +8,8 @@ ThisBuild / licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT")))
 
 ThisBuild / scalaVersion := "2.13.3"
 
+addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full)
+
 lazy val root = (project in file("."))
   .settings(
     name := "action-processor-integrations",

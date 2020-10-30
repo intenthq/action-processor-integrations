@@ -1,10 +1,10 @@
-package com.intenthq.action_processor.integrationsV2
+package com.intenthq.action_processor.integrationsV2.aggregations
 
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import cats.effect.{IO, Resource}
 
-import scala.jdk.CollectionConverters.IteratorHasAsScala
+import scala.jdk.CollectionConverters._
 
 object Aggregate {
 
