@@ -11,7 +11,7 @@ trait Feed[I, O] {
   final def stream: fs2.Stream[IO, Array[Byte]] =
     inputStream
       .through(transform)
-      .map { case (a, counter) => serialize(a, counter) }
+      .map((serialize _).tupled)
 }
 
 trait NoAggregate[I] { self: Feed[I, I] =>

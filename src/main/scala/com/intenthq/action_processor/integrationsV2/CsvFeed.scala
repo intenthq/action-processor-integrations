@@ -10,31 +10,32 @@ import sourcecode.Text.generate
 
 import scala.jdk.CollectionConverters._
 
-abstract class CsvFeed[I <: Product, O] extends Feed[I, O] {
+abstract class CsvFeed[O] extends Feed[Iterable[String], O] {
 
-  protected val csvResource: String
+//  protected val csvResource: String
 
-  private lazy val typeFactory = new ReflectionHelpers.CaseClassFactory[I]
+//  private lazy val typeFactory = new ReflectionHelpers.CaseClassFactory[I]
 
   protected lazy val csvReader: CsvReader = new CsvReader
 
-  protected def rows: Stream[IO, I]
+  protected def rows: Stream[IO, String]
 
   private def csvParse(line: String): IO[Iterable[String]] =
     Resource.fromAutoCloseable(IO.delay(new StringReader(line))).use { sr =>
       Option(csvReader.parse(sr))
         .flatMap(parser => Option(parser.nextRow().getFields.asScala))
-        .getOrElse(Iterable.empty[String])
+        .getOrElse(collection.mutable.Buffer.empty[String])
         .pure[IO]
     }
 
-  override def inputStream: Stream[IO, I] = rows
+  override def inputStream: Stream[IO, Iterable[String]] =
+    rows.evalMap(csvParse)
 
-  protected def fromString: fs2.Pipe[IO, String, I] =
-    sourceStream => {
-      sourceStream.evalMap { line =>
-        val params = csvParse(line).productIterator.toList
-        IO(typeFactory.buildWith(params))
-      }
-    }
+//  protected def fromString: fs2.Pipe[IO, Iterable[String], I] =
+//    sourceStream => {
+//      sourceStream.evalMap { line =>
+//        val params = .productIterator.toList
+//        IO(typeFactory.buildWith(params))
+//      }
+//    }
 }
