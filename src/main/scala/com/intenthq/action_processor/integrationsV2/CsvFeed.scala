@@ -17,12 +17,13 @@ abstract class CsvFeed[O] extends Feed[Iterable[String], O] {
 
   private def csvParse(line: String): IO[Iterable[String]] =
     Resource.fromAutoCloseable(IO.delay(new StringReader(line))).use { sr =>
-      Option(csvReader.parse(sr))
-        .flatMap(parser => Option(parser.nextRow()).map(_.getFields.asScala))
+      Option(csvReader.parse(sr).nextRow())
+        .map(_.getFields.asScala)
         .getOrElse(collection.mutable.Buffer.empty[String])
         .pure[IO]
     }
 
   override def inputStream: Stream[IO, Iterable[String]] =
     rows.evalMap(csvParse)
+
 }

@@ -18,5 +18,6 @@ trait LocalFileCsvFeed[O] extends CsvFeed[O] {
         .readAll[IO](Paths.get(localFilePath), blocker, 4096)
         .through(text.utf8Decode)
         .through(text.lines)
+        .dropLastIf(_.isEmpty)
     }
 }
