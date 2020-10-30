@@ -6,7 +6,8 @@ import doobie.util.transactor.{Strategy, Transactor}
 
 import scala.util.Properties
 
-abstract class HiveFeed[I, O] extends SQLFeed[I, O]("org.apache.hive.jdbc.HiveDriver") with TimeMeta with JavaLegacyTimeMeta {
+trait HiveFeed[I, O] extends SQLFeed[I, O] with TimeMeta with JavaLegacyTimeMeta {
+  override protected val driver: String = "org.apache.hive.jdbc.HiveDriver"
   override protected lazy val transactor: Transactor[IO] = Transactor.strategy.set(createTransactor, Strategy.void)
   override protected val jdbcUrl: String = Properties.envOrElse("HIVE_JDBC_URL", "jdbc:hive2://localhost:10000")
 }

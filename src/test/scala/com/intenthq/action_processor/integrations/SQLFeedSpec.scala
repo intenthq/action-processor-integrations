@@ -105,7 +105,8 @@ case class ExampleCsvFeedRow(integer: Int,
                              timestamp: Instant
 )
 
-abstract class H2Source[I, O] extends SQLFeed[I, O]("org.h2.Driver") with TimeMeta with JavaTimeMeta {
+abstract class H2Source[I, O] extends SQLFeed[I, O] with TimeMeta with JavaTimeMeta {
+  override protected val driver: String = "org.h2.Driver"
   override protected val jdbcUrl: String = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;USER=sa;PASSWORD="
 }
 
