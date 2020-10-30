@@ -5,8 +5,9 @@ import weaver.SimpleIOSuite
 object CsvFeedSpec extends SimpleIOSuite {
 
   private val expectedResult: Set[String] = Set(
-    "447722222222,20150620000000,apple.com,1",
-    "447599999999,20150620000000,microsoft.co.uk,3"
+    "Peter,Big Street 1,11",
+    "Gabriela,Big Street 2,7",
+    "Jolie,Big Street 3,4"
   ).map(_ + '\n')
 
   simpleTest("should return a stream of parsed csv feed rows") {
