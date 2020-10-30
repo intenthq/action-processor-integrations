@@ -29,5 +29,4 @@ object CsvSerialization {
     appender.close()
     sw.toString.getBytes(StandardCharsets.UTF_8)
   }
-
 }

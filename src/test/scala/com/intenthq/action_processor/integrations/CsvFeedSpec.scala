@@ -11,7 +11,7 @@ object CsvFeedSpec extends SimpleIOSuite {
 
   simpleTest("should return a stream of parsed csv feed rows") {
     for {
-      rowsBytes <- ExampleLocalFileCsvFeed.stream(SourceContext.empty).compile.toList
+      rowsBytes <- ExampleLocalFileCsvFeed.stream.compile.toList
       rows = rowsBytes.map(new String(_)).toSet
     } yield expect(rows == expectedResult)
   }
