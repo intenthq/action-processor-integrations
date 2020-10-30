@@ -1,15 +1,16 @@
-package com.intenthq.action_processor.integrationsV2
+package com.intenthq.action_processor.integrationsV2.feeds
 
 import java.io.StringReader
 
 import cats.effect.{IO, Resource}
 import cats.implicits.catsSyntaxApplicativeId
+import com.intenthq.action_processor.integrations.SourceContext
 import de.siegmar.fastcsv.reader.CsvReader
 import fs2.Stream
 
 import scala.jdk.CollectionConverters._
 
-abstract class CsvFeed[O] extends Feed[Iterable[String], O] {
+trait CSVFeed[O] extends Feed[Iterable[String], O] {
 
   protected lazy val csvReader: CsvReader = new CsvReader
 
@@ -23,7 +24,7 @@ abstract class CsvFeed[O] extends Feed[Iterable[String], O] {
         .pure[IO]
     }
 
-  override def inputStream: Stream[IO, Iterable[String]] =
+  override def inputStream(sourceContext: SourceContext[IO]): Stream[IO, Iterable[String]] =
     rows.evalMap(csvParse)
 
 }

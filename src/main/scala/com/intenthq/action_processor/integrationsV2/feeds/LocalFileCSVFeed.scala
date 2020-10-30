@@ -1,4 +1,4 @@
-package com.intenthq.action_processor.integrationsV2
+package com.intenthq.action_processor.integrationsV2.feeds
 
 import java.nio.file.Paths
 
@@ -7,7 +7,7 @@ import fs2.text
 
 import scala.util.Properties
 
-trait LocalFileCsvFeed[O] extends CsvFeed[O] {
+trait LocalFileCSVFeed[O] extends CSVFeed[O] {
 
   implicit protected val contextShift: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
   protected val localFilePath: String = Properties.envOrElse("CSV_RESOURCE", "/data.csv")
