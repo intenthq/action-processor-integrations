@@ -6,8 +6,9 @@ import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
 
-abstract class SQLFeed[I, O](driver: String) extends Feed[I, O] with DoobieImplicits {
+trait SQLFeed[I, O] extends Feed[I, O] with DoobieImplicits {
 
+  protected val driver: String
   protected val jdbcUrl: String
   protected def query(sourceContext: SourceContext[IO]): Query0[I]
 
