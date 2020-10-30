@@ -14,7 +14,7 @@ import doobie.util.transactor.Transactor
 import doobie.util.update.Update
 import weaver.IOSuite
 
-object SQLCSVFeedSpec extends IOSuite {
+object SqlCsvFeedSpec extends IOSuite {
 
   override type Res = Transactor[IO]
 
