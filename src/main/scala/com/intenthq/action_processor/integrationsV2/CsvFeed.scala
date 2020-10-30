@@ -11,10 +11,6 @@ import scala.jdk.CollectionConverters._
 
 abstract class CsvFeed[O] extends Feed[Iterable[String], O] {
 
-//  protected val csvResource: String
-
-//  private lazy val typeFactory = new ReflectionHelpers.CaseClassFactory[I]
-
   protected lazy val csvReader: CsvReader = new CsvReader
 
   protected def rows: Stream[IO, String]
@@ -29,12 +25,4 @@ abstract class CsvFeed[O] extends Feed[Iterable[String], O] {
 
   override def inputStream: Stream[IO, Iterable[String]] =
     rows.evalMap(csvParse)
-
-//  protected def fromString: fs2.Pipe[IO, Iterable[String], I] =
-//    sourceStream => {
-//      sourceStream.evalMap { line =>
-//        val params = .productIterator.toList
-//        IO(typeFactory.buildWith(params))
-//      }
-//    }
 }
