@@ -24,9 +24,9 @@ object ExampleLocalFileCsvFeed extends LocalFileCsvFeed[AggregatedPerson] {
 
   override def transform: Pipe[IO, Iterable[String], (AggregatedPerson, Long)] = Aggregate.aggregateByKey[Iterable[String], AggregatedPerson](key, counter)
 
-  override def serialize(a: AggregatedPerson, counter: Long): Array[Byte] = CsvSerialization.serialize((a, counter)).unsafeRunSync()
+  override def serialize(a: AggregatedPerson, counter: Long): Array[Byte] = CsvSerialization.serialize((a, counter))
 }
 
 object ExampleLocalFileCsvFeed2 extends LocalFileCsvFeed[Iterable[String]] with NoAggregate[Iterable[String]] {
-  override def serialize(o: Iterable[String], counter: Long): Array[Byte] = CsvSerialization.serialize(o).unsafeRunSync()
+  override def serialize(o: Iterable[String], counter: Long): Array[Byte] = CsvSerialization.serialize(o)
 }
