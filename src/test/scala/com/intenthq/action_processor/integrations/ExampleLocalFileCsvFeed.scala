@@ -3,24 +3,24 @@ package com.intenthq.action_processor.integrations
 import java.nio.file.Paths
 
 import cats.effect.IO
+import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
+import com.intenthq.action_processor.integrationsV2.{Aggregate, LocalFileCsvFeed}
+import fs2.Pipe
 
-object ExampleLocalFileCsvFeed extends LocalFileCsvSource {
+case class Person(name: String, address: String, score: Int) {
+  lazy val aggregateKey: AggregatedPerson = AggregatedPerson(name, address)
+}
 
-  override protected val csvResource: String = Paths.get(getClass.getResource("/example.csv").toURI).toAbsolutePath.toString
+case class AggregatedPerson(name: String, address: String)
+
+object ExampleLocalFileCsvFeed extends LocalFileCsvFeed[Person, AggregatedPerson] {
+
+  override protected val csvResource: String = Paths.get(getClass.getResource("/persons.csv").toURI).toAbsolutePath.toString
 
   csvReader.setFieldSeparator('|')
 
-  override def aggregate(context: SourceContext[IO])(line: String): IO[Unit] = {
-    def addToContextMap(csvTokens: Iterable[String]) =
-      csvTokens.lastOption.map(DomainStemmer.apply).fold(IO.unit) { domain =>
-        val key = (csvTokens.dropRight(2) ++ Seq(domain)).mkString(",")
-        val previousCounter = context.map.getOrDefault(key, 0)
-        IO.delay(context.map.put(key, previousCounter + 1)).void
-      }
+  override def transform: Pipe[IO, Person, (AggregatedPerson, Long)] =
+    Aggregate.aggregateByKey[Person, AggregatedPerson](_.aggregateKey, _.score.toLong)
 
-    for {
-      csvTokens <- csvParse(line)
-      _ <- addToContextMap(csvTokens)
-    } yield ()
-  }
+  override def serialize(a: AggregatedPerson, counter: Long): Array[Byte] = CsvSerialization.serialize((a, counter)).unsafeRunSync()
 }
