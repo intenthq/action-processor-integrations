@@ -1,19 +1,20 @@
 package com.intenthq.action_processor.integrations.serializations.csv
 
-import cats.effect.IO
-import cats.implicits._
+import java.nio.charset.StandardCharsets
 import java.time._
+
+import cats.implicits._
 import weaver.{Expectations, SimpleIOSuite}
 
 object CsvSerializationSpec extends SimpleIOSuite {
 
-  private def serialize[T: Csv](t: T): IO[String] = CsvSerialization.serialize(t).map(new String(_))
-  private def checkLine[T: Csv](toSer: T, csv: String): IO[Expectations] =
-    for {
-      result <- serialize(toSer)
-    } yield expect(result == csv + CsvSerialization.lineDelimiter)
+  private def serialize[T: Csv](t: T): String = new String(CsvSerialization.serialize(t), StandardCharsets.UTF_8)
+  private def checkLine[T: Csv](toSer: T, csv: String): Expectations = {
+    val result = serialize(toSer)
+    expect(result == csv + CsvSerialization.lineDelimiter)
+  }
 
-  simpleTest("Serialize a single field case class") {
+  pureTest("Serialize a single field case class") {
     case class Test(a: String)
     checkLine(Test("a"), "a")
   }

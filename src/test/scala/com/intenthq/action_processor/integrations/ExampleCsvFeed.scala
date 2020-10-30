@@ -29,7 +29,7 @@ abstract class H2Source[O] extends SQLSource[O]("org.h2.Driver") with TimeMeta w
 
 object ExampleCsvFeed extends H2Source[ExampleCsvFeedRow] {
 
-  override def transform(context: SourceContext[IO])(e: ExampleCsvFeedRow): IO[Array[Byte]] = CsvSerialization.serialize[ExampleCsvFeedRow](e)
+  override def transform(context: SourceContext[IO])(e: ExampleCsvFeedRow): IO[Array[Byte]] = IO.pure(CsvSerialization.serialize[ExampleCsvFeedRow](e))
 
   override def query(context: SourceContext[IO]): Query0[ExampleCsvFeedRow] =
     (
