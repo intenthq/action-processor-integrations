@@ -18,7 +18,7 @@ import weaver.IOSuite
 
 import scala.concurrent.ExecutionContextExecutor
 
-object SQLFeedSpec extends IOSuite with SqlCsvFeedSpecResource {
+object SQLFeedSpec extends IOSuite with SQLFeedSpecResources {
 
   override val exampleRows: Seq[ExampleCsvFeedRow] = (1 to 100).map(n =>
     ExampleCsvFeedRow(
@@ -46,7 +46,7 @@ object SQLFeedSpec extends IOSuite with SqlCsvFeedSpecResource {
 
 }
 
-trait SqlCsvFeedSpecResource { self: IOSuite =>
+trait SQLFeedSpecResources { self: IOSuite =>
   override type Res = Transactor[IO]
 
   protected val exampleRows: Seq[ExampleCsvFeedRow]
