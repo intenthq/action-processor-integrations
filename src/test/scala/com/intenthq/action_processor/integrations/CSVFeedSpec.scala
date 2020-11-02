@@ -8,7 +8,7 @@ import cats.effect.{IO, Resource}
 import cats.implicits._
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
 import com.intenthq.action_processor.integrationsV2.aggregations.NoAggregate
-import com.intenthq.action_processor.integrationsV2.feeds.LocalFileCSVFeed
+import com.intenthq.action_processor.integrationsV2.feeds.{FeedContext, LocalFileCSVFeed}
 import weaver.IOSuite
 
 object CSVFeedSpec extends IOSuite with CSVFeedSpecResources {
@@ -29,7 +29,7 @@ object CSVFeedSpec extends IOSuite with CSVFeedSpecResources {
     ).map(_ + '\n')
 
     for {
-      feedStreamLinesBytes <- resources.csvFeed.stream(SourceContext.empty).compile.toList
+      feedStreamLinesBytes <- resources.csvFeed.stream(FeedContext.empty).compile.toList
       feedStreamLines = feedStreamLinesBytes.map(bytes => new String(bytes, StandardCharsets.UTF_8)).toSet
     } yield expect(feedStreamLines == expectedResult)
   }

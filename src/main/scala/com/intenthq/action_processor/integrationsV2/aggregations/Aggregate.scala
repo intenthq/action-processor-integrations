@@ -11,6 +11,7 @@ object Aggregate {
   def noop[I]: fs2.Pipe[IO, I, (I, Long)] = _.map(_ -> 1L)
 
   private def loadAggRepository[K]: Resource[IO, ConcurrentMap[K, Long]] =
+    // TODO: Insert MapDB here ...
     Resource.liftF(IO.pure(new ConcurrentHashMap[K, Long]()))
 
   def aggregateByKey[I, K](key: I => K, counter: I => Long): fs2.Pipe[IO, I, (K, Long)] =

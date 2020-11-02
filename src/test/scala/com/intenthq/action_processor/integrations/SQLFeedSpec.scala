@@ -7,7 +7,7 @@ import cats.effect.{Async, Blocker, Bracket, ContextShift, IO, Resource}
 import cats.implicits._
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
 import com.intenthq.action_processor.integrationsV2.aggregations.NoAggregate
-import com.intenthq.action_processor.integrationsV2.feeds.SQLFeed
+import com.intenthq.action_processor.integrationsV2.feeds.{FeedContext, SQLFeed}
 import doobie.h2.H2Transactor
 import doobie.implicits._
 import doobie.implicits.javatime._
@@ -38,7 +38,7 @@ object SQLFeedSpec extends IOSuite with SQLFeedSpecResources {
 
   test("should return a stream of parsed ExampleFeedRow") { _ =>
     for {
-      feedStreamLinesBytes <- ExampleCsvFeed.stream(SourceContext.empty).compile.toList
+      feedStreamLinesBytes <- ExampleCsvFeed.stream(FeedContext.empty).compile.toList
       feedStreamLines = feedStreamLinesBytes.map(new String(_))
       expectedOutput = exampleRows.map(CsvSerialization.serialize[ExampleCsvFeedRow]).map(new String(_))
     } yield expect(feedStreamLines == expectedOutput)
@@ -112,7 +112,7 @@ abstract class H2Source[I, O] extends SQLFeed[I, O] with TimeMeta with JavaTimeM
 
 object ExampleCsvFeed extends H2Source[ExampleCsvFeedRow, ExampleCsvFeedRow] with NoAggregate[ExampleCsvFeedRow] {
 
-  override def query(context: SourceContext[IO]): Query0[ExampleCsvFeedRow] =
+  override def query(context: FeedContext[IO]): Query0[ExampleCsvFeedRow] =
     (
       sql"""SELECT integer, bigint, float, double, decimal, numeric, bit, varchar, date, time, timestamp
            |FROM example""".stripMargin ++
