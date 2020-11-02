@@ -1,7 +1,7 @@
 package com.intenthq.action_processor.integrationsV2.feeds
 
 import cats.effect.{ContextShift, IO}
-import com.intenthq.action_processor.integrations.{DoobieImplicits, SourceContext}
+import com.intenthq.action_processor.integrations.DoobieImplicits
 import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
@@ -10,7 +10,7 @@ trait SQLFeed[I, O] extends Feed[I, O] with DoobieImplicits {
 
   protected val driver: String
   protected val jdbcUrl: String
-  protected def query(sourceContext: SourceContext[IO]): Query0[I]
+  protected def query(sourceContext: FeedContext[IO]): Query0[I]
 
   implicit private val contextShift: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
 
@@ -19,8 +19,8 @@ trait SQLFeed[I, O] extends Feed[I, O] with DoobieImplicits {
 
   protected def createTransactor: Aux[IO, Unit] = Transactor.fromDriverManager[IO](driver, jdbcUrl)
 
-  override def inputStream(sourceContext: SourceContext[IO]): fs2.Stream[IO, I] =
-    query(sourceContext)
+  override def inputStream(feedContext: FeedContext[IO]): fs2.Stream[IO, I] =
+    query(feedContext)
       .streamWithChunkSize(chunkSize)
       .transact[IO](transactor)
 }
