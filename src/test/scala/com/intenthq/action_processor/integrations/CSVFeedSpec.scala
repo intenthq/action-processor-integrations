@@ -7,12 +7,11 @@ import java.nio.file.Files
 import cats.effect.{IO, Resource}
 import cats.implicits._
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
-import com.intenthq.action_processor.integrationsV2.aggregations.Aggregate
+import com.intenthq.action_processor.integrationsV2.aggregations.NoAggregate
 import com.intenthq.action_processor.integrationsV2.feeds.LocalFileCSVFeed
-import fs2.Pipe
 import weaver.IOSuite
 
-object CSVFeedSpec extends IOSuite with CsvFeedSpecResources {
+object CSVFeedSpec extends IOSuite with CSVFeedSpecResources {
 
   override val csvFeedContent: String =
     """"Peter"|"Big Street 1"|"5"
@@ -23,9 +22,10 @@ object CSVFeedSpec extends IOSuite with CsvFeedSpecResources {
 
   test("should return a stream of aggregated csv feed rows") { resources =>
     val expectedResult: Set[String] = Set(
-      "Peter,Big Street 1,11",
+      "Peter,Big Street 1,5",
       "Gabriela,Big Street 2,7",
-      "Jolie,Big Street 3,4"
+      "Jolie,Big Street 3,4",
+      "Peter,Big Street 1,6"
     ).map(_ + '\n')
 
     for {
@@ -35,7 +35,8 @@ object CSVFeedSpec extends IOSuite with CsvFeedSpecResources {
   }
 }
 
-trait CsvFeedSpecResources { self: IOSuite =>
+trait CSVFeedSpecResources { self: IOSuite =>
+
   case class Resources(csvFeed: ExampleLocalFileCSVFeed)
   override type Res = Resources
 
@@ -61,18 +62,9 @@ trait CsvFeedSpecResources { self: IOSuite =>
   }
 }
 
-case class AggregatedPerson(name: String, address: String)
-
-class ExampleLocalFileCSVFeed(override val localFilePath: String) extends LocalFileCSVFeed[AggregatedPerson] {
+class ExampleLocalFileCSVFeed(override val localFilePath: String) extends LocalFileCSVFeed[Iterable[String]] with NoAggregate[Iterable[String]] {
 
   csvReader.setFieldSeparator('|')
 
-  private def key(columns: Iterable[String]) = {
-    val v = columns.toVector
-    AggregatedPerson(v(0), v(1))
-  }
-
-  private def counter(columns: Iterable[String]) = columns.lastOption.flatMap(v => scala.util.Try(v.toLong).toOption).getOrElse(0L)
-  override def transform: Pipe[IO, Iterable[String], (AggregatedPerson, Long)] = Aggregate.aggregateByKey[Iterable[String], AggregatedPerson](key, counter)
-  override def serialize(a: AggregatedPerson, counter: Long): Array[Byte] = CsvSerialization.serialize((a, counter))
+  override def serialize(o: Iterable[String], counter: Long): Array[Byte] = CsvSerialization.columnsAsCsv(o)
 }

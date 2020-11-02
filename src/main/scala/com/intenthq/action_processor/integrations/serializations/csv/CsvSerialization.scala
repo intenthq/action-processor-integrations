@@ -14,15 +14,16 @@ object CsvSerialization {
     writer
   }
 
-  private def encode[O](o: O)(implicit csv: Csv[O]): Array[String] = csv.toCSV(o)
+  def encodeAsColumns[O](o: O)(implicit csv: Csv[O]): Seq[String] = csv.toCSV(o)
 
-  def serialize[O](o: O)(implicit csv: Csv[O]): Array[Byte] = {
+  def columnsAsCsv(columns: Iterable[String]): Array[Byte] = {
     val sw = new StringWriter()
-    val columns = encode(o)
     val appender = csvWriter.append(sw)
-    appender.appendLine(columns: _*)
+    appender.appendLine(columns.toSeq: _*)
     // Make sure we flush internal appender FastBufferedWriter
     appender.close()
     sw.toString.getBytes(StandardCharsets.UTF_8)
   }
+
+  def serialize[O](o: O)(implicit csv: Csv[O]): Array[Byte] = columnsAsCsv(encodeAsColumns(o))
 }
