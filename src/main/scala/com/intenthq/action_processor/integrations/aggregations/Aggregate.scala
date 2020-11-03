@@ -2,7 +2,7 @@ package com.intenthq.action_processor.integrations.aggregations
 
 import java.util.concurrent.ConcurrentMap
 
-import cats.effect.{IO, Resource}
+import cats.effect.{Blocker, ContextShift, IO, Resource, SyncIO}
 import com.intenthq.action_processor.integrations.config.MapDbSettings
 import com.intenthq.action_processor.integrations.feeds.FeedContext
 import com.intenthq.action_processor.integrations.repositories.MapDBRepository
@@ -14,9 +14,12 @@ import scala.jdk.CollectionConverters._
 
 object Aggregate {
 
+  private lazy val blocker = Blocker[SyncIO].allocated.unsafeRunSync()._1
+  implicit private val contextShift: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
+
   def noop[I]: fs2.Pipe[IO, I, (I, Long)] = _.map(_ -> 1L)
 
-  private def loadAggRepository[K](mapDbSettings: MapDbSettings): Resource[IO, HTreeMap[K, Long]] = {
+  private def loadAggRepository[K](mapDbSettings: MapDbSettings)(blocker: Blocker): Resource[IO, HTreeMap[K, Long]] = {
 
     val serializer: Serializer[K] = new GroupSerializerObjectArray[K] {
       val elsaSerializer: ElsaSerializer = new ElsaMaker().make
@@ -25,7 +28,7 @@ object Aggregate {
     }
 
     MapDBRepository
-      .load(mapDbSettings)
+      .load(mapDbSettings)(blocker)
       .map(db =>
         db.hashMap("stuff", serializer, Serializer.LONG.asInstanceOf[Serializer[Long]])
           .layout(mapDbSettings.segments, mapDbSettings.nodeSize, mapDbSettings.levels)
@@ -52,7 +55,7 @@ object Aggregate {
           )
           .map(e => (e.getKey, e.getValue))
 
-      fs2.Stream.resource[IO, ConcurrentMap[K, Long]](loadAggRepository(feedContext.mapDbSettings)).flatMap { aggRepository =>
+      fs2.Stream.resource[IO, ConcurrentMap[K, Long]](loadAggRepository(feedContext.mapDbSettings)(blocker)).flatMap { aggRepository =>
         sourceStream.evalMap { i =>
           put(aggRepository, i)
         }.drain ++ streamKeyValue(aggRepository)
