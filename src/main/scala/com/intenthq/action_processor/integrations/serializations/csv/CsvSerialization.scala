@@ -1,6 +1,6 @@
 package com.intenthq.action_processor.integrations.serializations.csv
 
-import java.io._
+import java.io.StringWriter
 import java.nio.charset.StandardCharsets
 
 import de.siegmar.fastcsv.writer.CsvWriter

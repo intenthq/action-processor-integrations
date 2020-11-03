@@ -4,16 +4,16 @@ import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate, LocalTime}
 
 import cats.effect.{Async, Blocker, Bracket, ContextShift, IO, Resource}
-import cats.implicits._
+import cats.implicits.toFunctorOps
+import com.intenthq.action_processor.integrations.aggregations.NoAggregate
+import com.intenthq.action_processor.integrations.feeds.{FeedContext, SQLFeed}
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
-import com.intenthq.action_processor.integrationsV2.aggregations.NoAggregate
-import com.intenthq.action_processor.integrationsV2.feeds.{FeedContext, SQLFeed}
 import doobie.h2.H2Transactor
-import doobie.implicits._
-import doobie.implicits.javatime._
+import doobie.implicits.{toConnectionIOOps, toSqlInterpolator}
 import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.update.Update
+import doobie.implicits.javatime._
 import weaver.IOSuite
 
 import scala.concurrent.ExecutionContextExecutor

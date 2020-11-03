@@ -1,4 +1,4 @@
-package com.intenthq.action_processor.integrationsV2.config
+package com.intenthq.action_processor.integrations.config
 
 import java.nio.file.Path
 

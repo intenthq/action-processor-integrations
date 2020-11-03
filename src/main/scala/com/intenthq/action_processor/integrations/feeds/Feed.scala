@@ -1,4 +1,4 @@
-package com.intenthq.action_processor.integrationsV2.feeds
+package com.intenthq.action_processor.integrations.feeds
 
 import cats.effect.IO
 

@@ -1,7 +1,7 @@
-package com.intenthq.action_processor.integrationsV2.aggregations
+package com.intenthq.action_processor.integrations.aggregations
 
 import cats.effect.IO
-import com.intenthq.action_processor.integrationsV2.feeds.{Feed, FeedContext}
+import com.intenthq.action_processor.integrations.feeds.{Feed, FeedContext}
 
 import scala.annotation.unused
 

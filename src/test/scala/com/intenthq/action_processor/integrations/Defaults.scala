@@ -2,8 +2,8 @@ package com.intenthq.action_processor.integrations
 
 import java.nio.file.Paths
 
-import com.intenthq.action_processor.integrationsV2.config.MapDbSettings
-import com.intenthq.action_processor.integrationsV2.feeds.{FeedContext, FeedFilter}
+import com.intenthq.action_processor.integrations.config.MapDbSettings
+import com.intenthq.action_processor.integrations.feeds.{FeedContext, FeedFilter}
 
 object Defaults {
 
