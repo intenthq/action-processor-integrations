@@ -27,10 +27,9 @@ object Aggregate {
     MapDBRepository
       .load(mapDbSettings)
       .map(db =>
-        db.hashMap("stuff", serializer, Serializer.LONG)
+        db.hashMap("stuff", serializer, Serializer.LONG.asInstanceOf[Serializer[Long]])
           .layout(mapDbSettings.segments, mapDbSettings.nodeSize, mapDbSettings.levels)
           .createOrOpen()
-          .asInstanceOf[HTreeMap[K, Long]]
       )
   }
 
