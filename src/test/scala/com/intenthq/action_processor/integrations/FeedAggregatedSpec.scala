@@ -4,9 +4,9 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
 import cats.effect.IO
+import com.intenthq.action_processor.integrations.aggregations.Aggregate
+import com.intenthq.action_processor.integrations.feeds.{Feed, FeedContext}
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
-import com.intenthq.action_processor.integrationsV2.aggregations.Aggregate
-import com.intenthq.action_processor.integrationsV2.feeds.{Feed, FeedContext}
 import fs2.Pipe
 import weaver.SimpleIOSuite
 

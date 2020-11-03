@@ -1,11 +1,11 @@
-package com.intenthq.action_processor.integrationsV2.repositories
+package com.intenthq.action_processor.integrations.repositories
 
 import java.io.File
 import java.nio.file.Paths
 import java.time.LocalDateTime
 
 import cats.effect.{IO, Resource}
-import com.intenthq.action_processor.integrationsV2.config.MapDbSettings
+import com.intenthq.action_processor.integrations.config.MapDbSettings
 import org.mapdb.{DB, DBMaker}
 
 object MapDBRepository {

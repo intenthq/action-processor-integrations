@@ -1,11 +1,11 @@
-package com.intenthq.action_processor.integrationsV2.aggregations
+package com.intenthq.action_processor.integrations.aggregations
 
 import java.util.concurrent.ConcurrentMap
 
 import cats.effect.{IO, Resource}
-import com.intenthq.action_processor.integrationsV2.config.MapDbSettings
-import com.intenthq.action_processor.integrationsV2.feeds.FeedContext
-import com.intenthq.action_processor.integrationsV2.repositories.MapDBRepository
+import com.intenthq.action_processor.integrations.config.MapDbSettings
+import com.intenthq.action_processor.integrations.feeds.FeedContext
+import com.intenthq.action_processor.integrations.repositories.MapDBRepository
 import org.mapdb.elsa.{ElsaMaker, ElsaSerializer}
 import org.mapdb.serializer.GroupSerializerObjectArray
 import org.mapdb.{DataInput2, DataOutput2, HTreeMap, Serializer}

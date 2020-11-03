@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.time._
 
 import cats.implicits._
+import com.intenthq.action_processor.integrations.serializations.csv.{Csv, CsvSerialization}
 import weaver.{Expectations, SimpleIOSuite}
 
 object CsvSerializationSpec extends SimpleIOSuite {
