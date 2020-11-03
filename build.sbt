@@ -27,7 +27,6 @@ lazy val root = (project in file("."))
       "org.tpolecat" %% "doobie-hikari" % "0.9.0",
       "com.google.guava" % "guava" % "30.0-jre",
       "com.disneystreaming" %% "weaver-framework" % "0.5.0" % "test",
-      "com.disneystreaming" %% "weaver-scalacheck" % "0.5.0" % "test",
       "org.tpolecat" %% "doobie-h2" % "0.9.0" % "test"
     )
   )
