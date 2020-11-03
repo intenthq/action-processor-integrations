@@ -19,7 +19,7 @@ trait CSVFeed[O] extends Feed[Iterable[String], O] {
     Resource.fromAutoCloseable(IO.delay(new StringReader(line))).use { sr =>
       Option(csvReader.parse(sr).nextRow())
         .map(_.getFields.asScala)
-        .getOrElse(collection.mutable.Buffer.empty[String])
+        .getOrElse(Iterable.empty[String])
         .pure[IO]
     }
 
