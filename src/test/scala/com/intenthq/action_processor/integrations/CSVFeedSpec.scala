@@ -29,7 +29,7 @@ object CSVFeedSpec extends IOSuite with CSVFeedSpecResources {
     ).map(_ + '\n')
 
     for {
-      feedStreamLinesBytes <- resources.csvFeed.stream(Defaults.feedContext).compile.toList
+      feedStreamLinesBytes <- resources.csvFeed.stream(TestDefaults.feedContext).compile.toList
       feedStreamLines = feedStreamLinesBytes.map(bytes => new String(bytes, StandardCharsets.UTF_8)).toSet
     } yield expect(feedStreamLines == expectedResult)
   }

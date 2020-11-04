@@ -38,7 +38,7 @@ object SQLFeedSpec extends IOSuite with SQLFeedSpecResources {
 
   test("should return a stream of parsed ExampleFeedRow") { _ =>
     for {
-      feedStreamLinesBytes <- ExampleCsvFeed.stream(Defaults.feedContext).compile.toList
+      feedStreamLinesBytes <- ExampleCsvFeed.stream(TestDefaults.feedContext).compile.toList
       feedStreamLines = feedStreamLinesBytes.map(new String(_))
       expectedOutput = exampleRows.map(CsvSerialization.serialize[ExampleCsvFeedRow]).map(new String(_))
     } yield expect(feedStreamLines == expectedOutput)

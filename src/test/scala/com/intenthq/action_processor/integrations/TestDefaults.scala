@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import com.intenthq.action_processor.integrations.config.MapDbSettings
 import com.intenthq.action_processor.integrations.feeds.{FeedContext, FeedFilter}
 
-object Defaults {
+object TestDefaults {
 
   val mapDbSettings: MapDbSettings = MapDbSettings(
     dbPath = Paths.get("/tmp"),

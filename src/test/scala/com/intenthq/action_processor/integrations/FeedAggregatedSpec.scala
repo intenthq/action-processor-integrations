@@ -27,7 +27,7 @@ object FeedAggregatedSpec extends SimpleIOSuite {
     ).map(_ + '\n')
 
     for {
-      feedStreamLinesBytes <- aggregatedFeed.stream(Defaults.feedContext).compile.toList
+      feedStreamLinesBytes <- aggregatedFeed.stream(TestDefaults.feedContext).compile.toList
       feedStreamLines = feedStreamLinesBytes.map(bytes => new String(bytes, StandardCharsets.UTF_8)).toSet
     } yield expect(feedStreamLines == expectedResult)
   }
