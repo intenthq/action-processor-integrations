@@ -15,18 +15,19 @@ lazy val root = (project in file("."))
     name := "action-processor-integrations",
     Compile / packageDoc / mappings := Seq(),
     Compile / packageSrc / mappings := Seq(),
-    testFrameworks += new TestFramework("weaver.framework.TestFramework"),
+    testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
     scalafmtOnCompile := true,
     libraryDependencies ++= Seq(
-      "co.fs2" %% "fs2-core" % "2.4.4",
-      "co.fs2" %% "fs2-io" % "2.4.4",
+      "co.fs2" %% "fs2-core" % "2.5.3",
+      "co.fs2" %% "fs2-io" % "2.5.3",
       "com.propensive" %% "magnolia" % "0.17.0",
       "de.siegmar" % "fastcsv" % "1.0.3",
       "org.mapdb" % "mapdb" % "3.0.8",
       "org.tpolecat" %% "doobie-core" % "0.9.0",
       "org.tpolecat" %% "doobie-hikari" % "0.9.0",
       "com.google.guava" % "guava" % "30.0-jre",
-      "com.disneystreaming" %% "weaver-framework" % "0.5.0" % "test",
-      "org.tpolecat" %% "doobie-h2" % "0.9.0" % "test"
+      "com.disneystreaming" %% "weaver-core" % "0.6.2" % Test,
+      "com.disneystreaming" %% "weaver-cats" % "0.6.2" % Test,
+      "org.tpolecat" %% "doobie-h2" % "0.9.0" % Test
     )
   )

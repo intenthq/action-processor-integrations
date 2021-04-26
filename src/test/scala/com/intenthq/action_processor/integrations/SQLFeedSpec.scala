@@ -5,9 +5,11 @@ import java.time.{Instant, LocalDate, LocalTime}
 
 import cats.effect.{Async, Blocker, Bracket, ContextShift, IO, Resource}
 import cats.implicits.toFunctorOps
+
 import com.intenthq.action_processor.integrations.aggregations.NoAggregate
 import com.intenthq.action_processor.integrations.feeds.{FeedContext, SQLFeed}
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
+
 import doobie.h2.H2Transactor
 import doobie.implicits.{toConnectionIOOps, toSqlInterpolator}
 import doobie.util.query.Query0
@@ -15,8 +17,7 @@ import doobie.util.transactor.Transactor
 import doobie.util.update.Update
 import doobie.implicits.javatime._
 import weaver.IOSuite
-
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 object SQLFeedSpec extends IOSuite with SQLFeedSpecResources {
 
@@ -55,7 +56,7 @@ trait SQLFeedSpecResources { self: IOSuite =>
     for {
       blocker <- Blocker[IO]
       // Given a transactor for an exanpleRows fixture populated database
-      transactor <- transactorResource[IO](blocker, ec)
+      transactor <- transactorResource[IO](blocker, ExecutionContext.global)
     } yield transactor
 
   private def transactorResource[F[_]: Async: ContextShift](blocker: Blocker, ec: ExecutionContextExecutor): Resource[F, H2Transactor[F]] = {

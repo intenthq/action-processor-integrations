@@ -20,24 +20,24 @@ object CsvSerializationSpec extends SimpleIOSuite {
     checkLine(Test("a"), "a")
   }
 
-  simpleTest("Serialize several fields case class") {
+  pureTest("Serialize several fields case class") {
     case class Test(a: String, b: String, c: String)
     checkLine(Test("a", "b", "c"), "a,b,c")
   }
 
-  simpleTest("Serialize nested case class") {
+  pureTest("Serialize nested case class") {
     case class Test1(a1: String, b1: Test2, c1: String)
     case class Test2(a2: String, b2: String, c2: String)
     checkLine(Test1("a1", Test2("a2", "b2", "c2"), "c1"), "a1,a2,b2,c2,c1")
   }
 
-  simpleTest("Serialize optional fields case class") {
+  pureTest("Serialize optional fields case class") {
     case class Test(a: String, b: Option[String], c: String)
     checkLine(Test("a", Some("b"), "c"), "a,b,c") |+|
       checkLine(Test("a", None, "c"), "a,,c")
   }
 
-  simpleTest("Serialize primitive types") {
+  pureTest("Serialize primitive types") {
     checkLine("a", "a") |+|
       checkLine(1, "1") |+|
       checkLine(1L, "1") |+|
