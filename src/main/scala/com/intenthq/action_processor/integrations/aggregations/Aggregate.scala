@@ -36,13 +36,15 @@ object Aggregate {
       )
   }
 
-  def aggregateByKey[I, K](feedContext: FeedContext[IO], key: I => K, counter: I => Long): fs2.Pipe[IO, I, (K, Long)] =
+  def aggregateByKeys[I, K](feedContext: FeedContext[IO], keys: I => List[K], counter: I => Long): fs2.Pipe[IO, I, (K, Long)] =
     sourceStream => {
 
       def put(aggRepository: ConcurrentMap[K, Long], o: I): IO[Unit] =
         IO.delay {
-          val previousCounter = aggRepository.getOrDefault(key(o), 0L)
-          aggRepository.put(key(o), counter(o) + previousCounter)
+          keys(o).foreach { value =>
+            val previousCounter = aggRepository.getOrDefault(value, 0L)
+            aggRepository.put(value, counter(o) + previousCounter)
+          }
         }.void
 
       def streamKeyValue(aggRepository: ConcurrentMap[K, Long]): fs2.Stream[IO, (K, Long)] =
@@ -61,4 +63,7 @@ object Aggregate {
         }.drain ++ streamKeyValue(aggRepository)
       }
     }
+
+  def aggregateByKey[I, K](feedContext: FeedContext[IO], key: I => K, counter: I => Long): fs2.Pipe[IO, I, (K, Long)] =
+    aggregateByKeys(feedContext, key.andThen(List(_)), counter)
 }
