@@ -15,7 +15,7 @@ import doobie.implicits.{toConnectionIOOps, toSqlInterpolator}
 import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.update.Update
-import doobie.implicits.javatime._
+import doobie.implicits.javatimedrivernative._
 import weaver.IOSuite
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
