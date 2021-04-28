@@ -52,14 +52,13 @@ object Aggregate {
             .flatTap { aggRepository =>
               fs2.Stream.eval_(IO.delay(println("Starting aggregation"))) ++
                 in.evalTap { o =>
-                  IO.sleep(1.second) >>
-                    IO.delay {
-                      keys(o).foreach { value =>
-                        val previousCounter = aggRepository.getOrDefault(value, 0L)
-                        aggRepository.put(value, counter(o) + previousCounter)
-                      }
+                  IO.delay {
+                    keys(o).foreach { value =>
+                      val previousCounter = aggRepository.getOrDefault(value, 0L)
+                      aggRepository.put(value, counter(o) + previousCounter)
                     }
-                }.through(AggregationsProgress.showAggregationProgress(1.millis))
+                  }
+                }.through(AggregationsProgress.showAggregationProgress(5.seconds))
                   .as(1)
                   .foldMonoid
                   .evalMap(n => IO.delay(println(s"Finished aggregation of $n rows")))
