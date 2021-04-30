@@ -8,9 +8,9 @@ object MapDbSettings {
 
   val Default: MapDbSettings = MapDbSettings(
     dbPath = Paths.get("/tmp"),
-    startDbSize = 5L * 1024,
-    incSize = 1L * 1024,
-    segments = 16,
+    startDbSize = 512 * 1024 * 1024, // 512MB
+    incSize = 512 * 1024 * 1024, // 512MB
+    segments = 8,
     nodeSize = 128,
     levels = 4
   )
