@@ -50,4 +50,10 @@ object CsvSerializationSpec extends SimpleIOSuite {
       checkLine(LocalDateTime.of(2020, 1, 1, 6, 2, 3), "2020-01-01T06:02:03") |+|
       checkLine(LocalDateTime.of(2020, 1, 1, 6, 2, 3).toInstant(ZoneOffset.UTC), "2020-01-01T06:02:03Z")
   }
+
+  pureTest("Serialize quoted values in strings") {
+    case class Test(a: String, b: Option[String], c: String)
+    checkLine(Test("a \"quoted\", value", Some("b"), "c"), "\"a \"\"quoted\"\", value\",b,c")
+  }
+
 }
