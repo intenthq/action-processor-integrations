@@ -6,9 +6,11 @@ ThisBuild / homepage := Some(url("https://github.com/intenthq/action-processor-i
 ThisBuild / developers := List(Developer("intenthq", "Intent HQ", null, url("https://www.intenthq.com/")))
 ThisBuild / licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT")))
 
-ThisBuild / scalaVersion := "2.13.3"
+ThisBuild / scalaVersion := "2.13.7"
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
-addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full)
+addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
 
 lazy val root = (project in file("."))
   .settings(
@@ -18,17 +20,16 @@ lazy val root = (project in file("."))
     testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
     scalafmtOnCompile := true,
     libraryDependencies ++= Seq(
-      "co.fs2" %% "fs2-core" % "2.5.5",
-      "co.fs2" %% "fs2-io" % "2.5.5",
-      "com.google.guava" % "guava" % "30.0-jre",
-      "com.propensive" %% "magnolia" % "0.17.0",
+      "co.fs2" %% "fs2-core" % "3.2.2",
+      "co.fs2" %% "fs2-io" % "3.2.2",
+      "com.softwaremill.magnolia1_2" %% "magnolia" % "1.0.0-M7",
       "de.siegmar" % "fastcsv" % "1.0.3",
       "org.mapdb" % "mapdb" % "3.0.8",
-      "org.tpolecat" %% "doobie-core" % "0.12.1",
-      "org.tpolecat" %% "doobie-hikari" % "0.12.1",
-      "com.disneystreaming" %% "weaver-cats" % "0.6.2" % Test,
-      "com.disneystreaming" %% "weaver-core" % "0.6.2" % Test,
-      "org.tpolecat" %% "doobie-h2" % "0.12.1" % Test
+      "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
+      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC1",
+      "com.disneystreaming" %% "weaver-cats" % "0.7.7" % Test,
+      "com.disneystreaming" %% "weaver-core" % "0.7.7" % Test,
+      "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1" % Test
     ),
     /*
     https://github.com/sbt/sbt/issues/3249#issuecomment-534757714

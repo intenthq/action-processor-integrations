@@ -2,7 +2,7 @@ package com.intenthq.action_processor.integrations.serializations.csv
 
 import java.time._
 
-import magnolia._
+import magnolia1._
 
 trait Csv[A] {
   def toCSV(a: A): Seq[String]
@@ -13,9 +13,9 @@ object Csv {
 
   type Typeclass[A] = Csv[A]
 
-  def combine[A](ctx: CaseClass[Csv, A]): Csv[A] = (a: A) => ctx.parameters.flatMap(p => p.typeclass.toCSV(p.dereference(a)))
+  def join[A](ctx: CaseClass[Csv, A]): Csv[A] = (a: A) => ctx.parameters.flatMap(p => p.typeclass.toCSV(p.dereference(a)))
 
-  def dispatch[A](ctx: SealedTrait[Csv, A]): Csv[A] = (a: A) => ctx.dispatch(a)(sub => sub.typeclass.toCSV(sub.cast(a)))
+  def split[A](ctx: SealedTrait[Csv, A]): Csv[A] = (a: A) => ctx.split(a)(sub => sub.typeclass.toCSV(sub.cast(a)))
 
   implicit def csvOpt[T: Csv]: Csv[Option[T]] = (a: Option[T]) => a.fold(Seq(""))(Csv[T].toCSV)
   implicit def csvIterable[T: Csv]: Csv[Iterable[T]] = (a: Iterable[T]) => Seq(a.map(Csv[T].toCSV).mkString(","))
