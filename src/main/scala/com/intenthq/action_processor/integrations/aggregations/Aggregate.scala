@@ -1,28 +1,21 @@
 package com.intenthq.action_processor.integrations.aggregations
 
-import java.util.concurrent.ConcurrentMap
-
-import scala.jdk.CollectionConverters._
-
-import cats.effect.{Blocker, ContextShift, IO, Resource, SyncIO}
-
+import cats.effect.{IO, Resource}
 import com.intenthq.action_processor.integrations.config.MapDbSettings
 import com.intenthq.action_processor.integrations.feeds.FeedContext
 import com.intenthq.action_processor.integrations.repositories.MapDBRepository
-
-import org.mapdb.{DataInput2, DataOutput2, HTreeMap, Serializer}
 import org.mapdb.elsa.{ElsaMaker, ElsaSerializer}
 import org.mapdb.serializer.GroupSerializerObjectArray
+import org.mapdb.{DataInput2, DataOutput2, HTreeMap, Serializer}
+
+import java.util.concurrent.ConcurrentMap
+import scala.jdk.CollectionConverters._
 
 object Aggregate {
 
-  private lazy val blocker = Blocker[SyncIO].allocated.unsafeRunSync()._1
-  private val ec = scala.concurrent.ExecutionContext.global
-  implicit private val contextShift: ContextShift[IO] = IO.contextShift(ec)
-
   def noop[I]: fs2.Pipe[IO, I, (I, Long)] = _.map(_ -> 1L)
 
-  private def loadAggRepository[K](mapDbSettings: MapDbSettings)(blocker: Blocker): Resource[IO, HTreeMap[K, Long]] = {
+  private def loadAggRepository[K](mapDbSettings: MapDbSettings): Resource[IO, HTreeMap[K, Long]] = {
 
     val serializer: Serializer[K] = new GroupSerializerObjectArray[K] {
       val elsaSerializer: ElsaSerializer = new ElsaMaker().make
@@ -31,7 +24,7 @@ object Aggregate {
     }
 
     MapDBRepository
-      .load(mapDbSettings)(blocker)
+      .load(mapDbSettings)
       .map(db =>
         db.hashMap("stuff", serializer, Serializer.LONG.asInstanceOf[Serializer[Long]])
           .layout(mapDbSettings.segments, mapDbSettings.nodeSize, mapDbSettings.levels)
@@ -46,9 +39,9 @@ object Aggregate {
       val aggregateInRepository: fs2.Pipe[IO, I, ConcurrentMap[K, Long]] =
         in => {
           fs2.Stream
-            .resource[IO, ConcurrentMap[K, Long]](loadAggRepository(feedContext.mapDbSettings)(blocker))
+            .resource[IO, ConcurrentMap[K, Long]](loadAggRepository(feedContext.mapDbSettings))
             .flatMap { aggRepository =>
-              fs2.Stream.eval_(IO.delay(println("Starting aggregation"))) ++
+              fs2.Stream.exec(IO.delay(println("Starting aggregation"))) ++
                 in.evalMapChunk { o =>
                   IO.delay {
                     keys(o).foreach { value =>

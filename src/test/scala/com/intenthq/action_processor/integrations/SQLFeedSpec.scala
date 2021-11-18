@@ -2,14 +2,11 @@ package com.intenthq.action_processor.integrations
 
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate, LocalTime}
-
-import cats.effect.{Async, Blocker, Bracket, ContextShift, IO, Resource}
+import cats.effect.{Async, IO, MonadCancel, Resource}
 import cats.implicits.toFunctorOps
-
 import com.intenthq.action_processor.integrations.aggregations.NoAggregate
 import com.intenthq.action_processor.integrations.feeds.{FeedContext, SQLFeed}
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
-
 import doobie.h2.H2Transactor
 import doobie.implicits.{toConnectionIOOps, toSqlInterpolator}
 import doobie.util.query.Query0
@@ -17,6 +14,7 @@ import doobie.util.transactor.Transactor
 import doobie.util.update.Update
 import doobie.implicits.javatimedrivernative._
 import weaver.IOSuite
+
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 object SQLFeedSpec extends IOSuite with SQLFeedSpecResources {
@@ -52,19 +50,14 @@ trait SQLFeedSpecResources { self: IOSuite =>
 
   protected val exampleRows: Seq[ExampleCsvFeedRow]
 
-  override def sharedResource: Resource[IO, Res] =
-    for {
-      blocker <- Blocker[IO]
-      // Given a transactor for an exanpleRows fixture populated database
-      transactor <- transactorResource[IO](blocker, ExecutionContext.global)
-    } yield transactor
+  override def sharedResource: Resource[IO, Res] = transactorResource[IO](ExecutionContext.global)
 
-  private def transactorResource[F[_]: Async: ContextShift](blocker: Blocker, ec: ExecutionContextExecutor): Resource[F, H2Transactor[F]] = {
-    val transactor = H2Transactor.newH2Transactor[F]("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "", ec, blocker)
+  private def transactorResource[F[_]: Async](ec: ExecutionContextExecutor): Resource[F, H2Transactor[F]] = {
+    val transactor = H2Transactor.newH2Transactor[F]("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "", ec)
     transactor.evalTap(insertDatabaseFixtures[F])
   }
 
-  private def insertDatabaseFixtures[F[_]: Bracket[*[_], Throwable]](transactor: Transactor[F]): F[Unit] = {
+  private def insertDatabaseFixtures[F[_]: MonadCancel[*[_], Throwable]](transactor: Transactor[F]): F[Unit] = {
     val createTable: doobie.ConnectionIO[Unit] =
       sql"""CREATE TABLE example(
            |  integer INTEGER NOT NULL,

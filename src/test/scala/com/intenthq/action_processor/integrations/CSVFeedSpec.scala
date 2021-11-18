@@ -1,15 +1,14 @@
 package com.intenthq.action_processor.integrations
 
-import java.io.{File, FileWriter}
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-
 import cats.effect.{IO, Resource}
-import cats.implicits._
 import com.intenthq.action_processor.integrations.aggregations.NoAggregate
 import com.intenthq.action_processor.integrations.feeds.LocalFileCSVFeed
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
 import weaver.IOSuite
+
+import java.io.{File, FileWriter}
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 
 object CSVFeedSpec extends IOSuite with CSVFeedSpecResources {
 
