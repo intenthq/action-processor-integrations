@@ -1,20 +1,20 @@
 package com.intenthq.action_processor.integrations
 
-import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate, LocalTime}
 import cats.effect.{Async, IO, MonadCancel, Resource}
 import cats.implicits.toFunctorOps
 import com.intenthq.action_processor.integrations.aggregations.NoAggregate
 import com.intenthq.action_processor.integrations.feeds.{FeedContext, SQLFeed}
+import com.intenthq.action_processor.integrations.implicits.DoobieImplicits
 import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
 import doobie.h2.H2Transactor
 import doobie.implicits.{toConnectionIOOps, toSqlInterpolator}
 import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.update.Update
-import doobie.implicits.javatimedrivernative._
 import weaver.IOSuite
 
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate, LocalTime}
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 object SQLFeedSpec extends IOSuite with SQLFeedSpecResources {
@@ -72,6 +72,10 @@ trait SQLFeedSpecResources { self: IOSuite =>
            |  time TIME NOT NULL,
            |  timestamp TIMESTAMP NOT NULL
            |)""".stripMargin.update.run.void
+
+    import doobie.implicits.javatimedrivernative._
+    locally(JavaTimeLocalDateMeta)
+
     val insertRows: Update[ExampleCsvFeedRow] = Update[ExampleCsvFeedRow](
       """INSERT INTO example(integer, bigint, float, double, decimal, numeric, bit, varchar, date, time, timestamp)
         |VALUES             (?,       ?,      ?,     ?,      ?,       ?,       ?,   ?,       ?,    ?,    ?        )""".stripMargin
@@ -99,12 +103,12 @@ case class ExampleCsvFeedRow(integer: Int,
                              timestamp: Instant
 )
 
-abstract class H2Source[I, O] extends SQLFeed[I, O] with TimeMeta with JavaTimeMeta {
+abstract class H2Feed[I, O] extends SQLFeed[I, O] with DoobieImplicits.javatime.drivernative {
   override protected val driver: String = "org.h2.Driver"
   override protected val jdbcUrl: String = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;USER=sa;PASSWORD="
 }
 
-object ExampleCsvFeed extends H2Source[ExampleCsvFeedRow, ExampleCsvFeedRow] with NoAggregate[ExampleCsvFeedRow] {
+object ExampleCsvFeed extends H2Feed[ExampleCsvFeedRow, ExampleCsvFeedRow] with NoAggregate[ExampleCsvFeedRow] {
 
   override def query(context: FeedContext[IO]): Query0[ExampleCsvFeedRow] =
     (

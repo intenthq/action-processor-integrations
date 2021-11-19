@@ -9,7 +9,7 @@ import fs2.Stream
 
 import scala.jdk.CollectionConverters._
 
-trait CSVFeed[O] extends Feed[Iterable[String], O] {
+trait ParseCSVInput[O] extends Feed[Iterable[String], O] {
 
   protected lazy val csvReader: CsvReader = new CsvReader
 

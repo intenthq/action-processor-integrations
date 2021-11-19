@@ -1,7 +1,7 @@
 package com.intenthq.action_processor.integrations.feeds
 
 import cats.effect.IO
-import com.intenthq.action_processor.integrations.DoobieImplicits
+import com.intenthq.action_processor.integrations.implicits.DoobieImplicits
 import doobie.util.query.Query0
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
