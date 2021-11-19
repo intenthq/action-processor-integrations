@@ -2,8 +2,9 @@ package com.intenthq.action_processor.integrations
 
 import cats.effect.{IO, Resource}
 import com.intenthq.action_processor.integrations.aggregations.NoAggregate
-import com.intenthq.action_processor.integrations.feeds.LocalFileCSVFeed
-import com.intenthq.action_processor.integrations.serializations.csv.CsvSerialization
+import com.intenthq.action_processor.integrations.feeds.LocalFileFeed
+import com.intenthq.action_processor.integrations.serializations.csv.{CsvSerialization, ParseCSVInput}
+import fs2.Pipe
 import weaver.IOSuite
 
 import java.io.{File, FileWriter}
@@ -36,7 +37,7 @@ object CSVFeedSpec extends IOSuite with CSVFeedSpecResources {
 
 trait CSVFeedSpecResources { self: IOSuite =>
 
-  case class Resources(csvFeed: ExampleLocalFileCSVFeed)
+  case class Resources(csvFeed: ExampleLocalFileSource)
   override type Res = Resources
 
   protected val csvFeedContent: String
@@ -47,7 +48,7 @@ trait CSVFeedSpecResources { self: IOSuite =>
       csvFeed <- csvFeed(csvFeedContent)
     } yield Resources(csvFeed)
 
-  def csvFeed(content: String): Resource[IO, ExampleLocalFileCSVFeed] = {
+  def csvFeed(content: String): Resource[IO, ExampleLocalFileSource] = {
     def createFileWriter(file: File) = Resource.fromAutoCloseable(IO.delay(new FileWriter(file)))
     def createTmpFile = {
       def createTmpFile = IO.delay(Files.createTempFile(null, null).toFile).flatTap(f => IO.delay(f.deleteOnExit()))
@@ -57,13 +58,13 @@ trait CSVFeedSpecResources { self: IOSuite =>
     createTmpFile
       .evalTap(createFileWriter(_).use(fw => IO.delay(fw.write(content))))
       .map(_.getAbsolutePath)
-      .map(new ExampleLocalFileCSVFeed(_))
+      .map(new ExampleLocalFileSource(_))
   }
 }
 
-class ExampleLocalFileCSVFeed(override val localFilePath: String) extends LocalFileCSVFeed[Iterable[String]] with NoAggregate[Iterable[String]] {
+class ExampleLocalFileSource(override val localFilePath: String) extends LocalFileFeed[Iterable[String], Iterable[String]] with NoAggregate[Iterable[String]] {
 
-  csvReader.setFieldSeparator('|')
+  protected val parseInput: Pipe[IO, Byte, Iterable[String]] = ParseCSVInput.parseInput[IO]('|')
 
   override def serialize(o: Iterable[String], counter: Long): Array[Byte] = CsvSerialization.columnsAsCsv(o)
 }

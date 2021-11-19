@@ -27,6 +27,7 @@ lazy val root = (project in file("."))
       "org.mapdb" % "mapdb" % "3.0.8",
       "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
       "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC1",
+      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1",
       "com.disneystreaming" %% "weaver-cats" % "0.7.7" % Test,
       "com.disneystreaming" %% "weaver-core" % "0.7.7" % Test,
       "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1" % Test
