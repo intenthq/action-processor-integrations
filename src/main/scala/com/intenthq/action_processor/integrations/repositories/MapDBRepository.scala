@@ -13,7 +13,8 @@ object MapDBRepository {
   def load(mapDBSettings: MapDbSettings): Resource[IO, DB] = {
     val dbInitOp = for {
       now <- IO.delay(LocalDateTime.now())
-      dbFile <- IO.delay(new File(Paths.get(mapDBSettings.dbPath.toString, s"dbb-${now.toLocalDate}-${now.toLocalTime}").toUri))
+      dbFile <-
+        IO.delay(new File(Paths.get(mapDBSettings.dbPath.toString, s"dbb-${now.toLocalDate}-${now.toLocalTime}").toUri))
       createDb <- IO.blocking {
         DBMaker
           .fileDB(dbFile.getAbsolutePath)
@@ -26,6 +27,8 @@ object MapDBRepository {
           .make()
       }
     } yield (createDb, dbFile)
-    Resource.make(dbInitOp)(db => IO.delay(db._1.close()).guarantee(IO.delay(Files.deleteIfExists(db._2.toPath)).void)).map(_._1)
+    Resource
+      .make(dbInitOp)(db => IO.delay(db._1.close()).guarantee(IO.delay(Files.deleteIfExists(db._2.toPath)).void))
+      .map(_._1)
   }
 }

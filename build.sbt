@@ -19,9 +19,11 @@ lazy val root = (project in file("."))
     Compile / packageSrc / mappings := Seq(),
     testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
     scalafmtOnCompile := true,
+    Test / scalacOptions --= Seq("-Xfatal-warnings"),
     libraryDependencies ++= Seq(
       "co.fs2" %% "fs2-core" % "3.2.2",
       "co.fs2" %% "fs2-io" % "3.2.2",
+      "com.google.crypto.tink" % "tink" % "1.6.1",
       "com.softwaremill.magnolia1_2" %% "magnolia" % "1.0.0-M7",
       "de.siegmar" % "fastcsv" % "1.0.3",
       "org.mapdb" % "mapdb" % "3.0.8",

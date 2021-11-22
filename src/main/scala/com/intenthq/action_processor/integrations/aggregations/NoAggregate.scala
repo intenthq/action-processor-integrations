@@ -7,5 +7,5 @@ import scala.annotation.unused
 
 trait NoAggregate[I] {
   self: Feed[I, I] =>
-  override def transform(@unused feedContext: FeedContext[IO]): fs2.Pipe[IO, I, (I, Long)] = Aggregate.noop
+  override def transform(@unused feedContext: FeedContext[IO]): fs2.Pipe[IO, I, I] = Aggregate.noop
 }

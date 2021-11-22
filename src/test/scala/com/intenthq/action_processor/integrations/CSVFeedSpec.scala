@@ -62,9 +62,11 @@ trait CSVFeedSpecResources { self: IOSuite =>
   }
 }
 
-class ExampleLocalFileSource(override val localFilePath: String) extends LocalFileFeed[Iterable[String], Iterable[String]] with NoAggregate[Iterable[String]] {
+class ExampleLocalFileSource(override val localFilePath: String)
+    extends LocalFileFeed[Iterable[String], Iterable[String]]
+    with NoAggregate[Iterable[String]] {
 
   protected val parseInput: Pipe[IO, Byte, Iterable[String]] = ParseCSVInput.parseInput[IO]('|')
 
-  override def serialize(o: Iterable[String], counter: Long): Array[Byte] = CsvSerialization.columnsAsCsv(o)
+  override def serialize(o: Iterable[String]): Array[Byte] = CsvSerialization.columnsAsCsv(o)
 }
