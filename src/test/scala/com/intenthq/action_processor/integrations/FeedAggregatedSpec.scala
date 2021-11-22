@@ -34,7 +34,8 @@ object FeedAggregatedSpec extends SimpleIOSuite {
         "rap.com" -> List("Music", "Rap"),
         "rock.com" -> List("Music", "Rock")
       )
-      override def get(key: String): IO[Option[List[String]]] = map.get(key).pure
+      override def get(key: String): IO[Option[List[String]]] =
+        map.get(key).pure
     }
 
     val expectedResult: Set[String] = Set(
@@ -49,8 +50,15 @@ object FeedAggregatedSpec extends SimpleIOSuite {
     ).map(_ + '\n')
 
     for {
-      feedStreamLinesBytes <- aggregatedFeed.stream(TestDefaults.feedContext.copy(embeddings = Some(mapping))).compile.toList
-      feedStreamLines = feedStreamLinesBytes.map(bytes => new String(bytes, StandardCharsets.UTF_8)).toSet
+      feedStreamLinesBytes <-
+        aggregatedFeed
+          .stream(TestDefaults.feedContext.copy(embeddings = Some(mapping)))
+          .compile
+          .toList
+      feedStreamLines =
+        feedStreamLinesBytes
+          .map(bytes => new String(bytes, StandardCharsets.UTF_8))
+          .toSet
     } yield expect(feedStreamLines == expectedResult)
   }
 }
@@ -59,30 +67,46 @@ case class Person(name: String, timestamp: LocalDateTime, domain: String, count:
 case class MappedPerson(name: String, timestamp: LocalDateTime, interests: List[String], count: Int)
 case class AggregatedPerson(name: String, timestamp: LocalDateTime, interest: String)
 
-class PersonsAggregatedByScoreFeed(persons: Person*) extends Feed[MappedPerson, AggregatedPerson] {
-  override def inputStream(feedContext: FeedContext[IO]): fs2.Stream[IO, MappedPerson] =
+class PersonsAggregatedByScoreFeed(persons: Person*) extends Feed[MappedPerson, (AggregatedPerson, Long)] {
+  override def inputStream(
+    feedContext: FeedContext[IO]
+  ): fs2.Stream[IO, MappedPerson] =
     fs2
       .Stream(persons: _*)
       .through(mapPersons(feedContext))
 
-  private def mapPersons(feedContext: FeedContext[IO]): Pipe[IO, Person, MappedPerson] = { in =>
-    fs2.Stream.eval(IO.fromOption(feedContext.embeddings)(new RuntimeException("Mapping required"))).flatMap { mappings =>
-      in.evalMap { person =>
-        mappings
-          .get(person.domain)
-          .map(
-            _.map(interests => MappedPerson(person.name, person.timestamp, interests, person.count))
-          )
-      }.unNone
-    }
+  private def mapPersons(
+    feedContext: FeedContext[IO]
+  ): Pipe[IO, Person, MappedPerson] = { in =>
+    fs2.Stream
+      .eval(
+        IO.fromOption(feedContext.embeddings)(
+          new RuntimeException("Mapping required")
+        )
+      )
+      .flatMap { mappings =>
+        in.evalMap { person =>
+          mappings
+            .get(person.domain)
+            .map(
+              _.map(interests => MappedPerson(person.name, person.timestamp, interests, person.count))
+            )
+        }.unNone
+      }
   }
 
-  override def transform(feedContext: FeedContext[IO]): Pipe[IO, MappedPerson, (AggregatedPerson, Long)] =
+  override def transform(
+    feedContext: FeedContext[IO]
+  ): Pipe[IO, MappedPerson, (AggregatedPerson, Long)] =
     Aggregate.aggregateByKeys[MappedPerson, AggregatedPerson](
       feedContext,
-      person => person.interests.map(AggregatedPerson(person.name, person.timestamp, _)),
+      person =>
+        person.interests.map(
+          AggregatedPerson(person.name, person.timestamp, _)
+        ),
       _.count.toLong
     )
 
-  override def serialize(o: AggregatedPerson, counter: Long): Array[Byte] = CsvSerialization.serialize((o, counter))
+  override def serialize(o: (AggregatedPerson, Long)): Array[Byte] =
+    CsvSerialization.serialize(o)
 }

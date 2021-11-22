@@ -13,7 +13,8 @@ object Csv {
 
   type Typeclass[A] = Csv[A]
 
-  def join[A](ctx: CaseClass[Csv, A]): Csv[A] = (a: A) => ctx.parameters.flatMap(p => p.typeclass.toCSV(p.dereference(a)))
+  def join[A](ctx: CaseClass[Csv, A]): Csv[A] =
+    (a: A) => ctx.parameters.flatMap(p => p.typeclass.toCSV(p.dereference(a)))
 
   def split[A](ctx: SealedTrait[Csv, A]): Csv[A] = (a: A) => ctx.split(a)(sub => sub.typeclass.toCSV(sub.cast(a)))
 
@@ -26,10 +27,17 @@ object Csv {
   implicit val csvDouble: Csv[Double] = (a: Double) => Seq(a.toString)
   implicit val csvBigDecimal: Csv[BigDecimal] = (a: BigDecimal) => Seq(a.toString)
   implicit val csvBoolean: Csv[Boolean] = (a: Boolean) => Seq(a.toString)
-  implicit val csvLocalDate: Csv[LocalDate] = (a: LocalDate) => Seq(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(a))
-  implicit val csvLocalTime: Csv[LocalTime] = (a: LocalTime) => Seq(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss").format(a))
+  implicit val csvLocalDate: Csv[LocalDate] = (a: LocalDate) =>
+    Seq(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(a))
+  implicit val csvLocalTime: Csv[LocalTime] = (a: LocalTime) =>
+    Seq(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss").format(a))
   implicit val csvInstant: Csv[Instant] = (a: Instant) => Seq(a.toString)
-  implicit val csvLocalDateTime: Csv[LocalDateTime] = (a: LocalDateTime) => Seq(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").format(a))
+  implicit val csvLocalDateTime: Csv[LocalDateTime] = (a: LocalDateTime) =>
+    Seq(
+      java.time.format.DateTimeFormatter
+        .ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        .format(a)
+    )
 
   implicit def deriveCsv[A]: Csv[A] = macro Magnolia.gen[A]
 }
