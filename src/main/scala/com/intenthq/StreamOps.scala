@@ -8,9 +8,12 @@ import scala.concurrent.duration.FiniteDuration
 import StreamOps._
 
 class StreamChunkOps[F[_], O](s: fs2.Stream[F, Chunk[O]]) {
-  private val parallelismEnabled: Boolean = scala.util.Properties.envOrNone("FS2_PARALLELISM").map(_.toBoolean).getOrElse(true)
+  private val parallelismEnabled: Boolean =
+    scala.util.Properties.envOrNone("FS2_PARALLELISM").map(_.toBoolean).getOrElse(true)
 
-  def parEvalMapChunksUnordered[F2[x] >: F[x]: Concurrent, O2](parallelism: Int)(f: Chunk[O] => F2[Chunk[O2]]): Stream[F2, O2] =
+  def parEvalMapChunksUnordered[F2[x] >: F[x]: Concurrent, O2](
+    parallelism: Int
+  )(f: Chunk[O] => F2[Chunk[O2]]): Stream[F2, O2] =
     if (!parallelismEnabled)
       s.flatMap(chunk => Stream.evalUnChunk(f(chunk)))
     else

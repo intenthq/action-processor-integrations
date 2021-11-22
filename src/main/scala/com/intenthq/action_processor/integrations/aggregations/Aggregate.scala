@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters._
 
 object Aggregate {
 
-  def noop[I]: fs2.Pipe[IO, I, (I, Long)] = _.map(_ -> 1L)
+  def noop[I]: fs2.Pipe[IO, I, I] = identity
 
   private def loadAggRepository[K](mapDbSettings: MapDbSettings): Resource[IO, HTreeMap[K, Long]] = {
 
@@ -32,28 +32,41 @@ object Aggregate {
       )
   }
 
-  def aggregateByKeys[I, K](feedContext: FeedContext[IO], keys: I => List[K], counter: I => Long): fs2.Pipe[IO, I, (K, Long)] =
+  def aggregateByKeys[I, K](feedContext: FeedContext[IO],
+                            keys: I => List[K],
+                            counter: I => Long
+  ): fs2.Pipe[IO, I, (K, Long)] =
     sourceStream => {
 
       // This pipe aggregates all the elemens and returns a single Map as an aggregate repository
       val aggregateInRepository: fs2.Pipe[IO, I, ConcurrentMap[K, Long]] =
         in => {
           fs2.Stream
-            .resource[IO, ConcurrentMap[K, Long]](loadAggRepository(feedContext.mapDbSettings))
+            .resource[IO, ConcurrentMap[K, Long]](
+              loadAggRepository(feedContext.mapDbSettings)
+            )
             .flatMap { aggRepository =>
               fs2.Stream.exec(IO.delay(println("Starting aggregation"))) ++
                 in.evalMapChunk { o =>
                   IO.delay {
                     keys(o).foreach { value =>
-                      val previousCounter = aggRepository.getOrDefault(value, 0L)
+                      val previousCounter =
+                        aggRepository.getOrDefault(value, 0L)
                       aggRepository.put(value, counter(o) + previousCounter)
                     }
                     aggRepository
                   }
                 }
                   // Returns last aggRepository with the counter of elements
-                  .fold((aggRepository, 0L)) { case ((_, previousRows), aggRepository) => (aggRepository, previousRows + 1) }
-                  .evalMapChunk { case (aggRepository, n) => IO.delay(println(s"Finished aggregation of $n rows")).as(aggRepository) }
+                  .fold((aggRepository, 0L)) {
+                    case ((_, previousRows), aggRepository) =>
+                      (aggRepository, previousRows + 1)
+                  }
+                  .evalMapChunk {
+                    case (aggRepository, n) =>
+                      IO.delay(println(s"Finished aggregation of $n rows"))
+                        .as(aggRepository)
+                  }
             }
         }
 

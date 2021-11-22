@@ -9,7 +9,8 @@ import weaver.{Expectations, SimpleIOSuite}
 
 object CsvSerializationSpec extends SimpleIOSuite {
 
-  private def serialize[T: Csv](t: T): String = new String(CsvSerialization.serialize(t), StandardCharsets.UTF_8)
+  private def serialize[T: Csv](t: T): String =
+    new String(CsvSerialization.serialize(t), StandardCharsets.UTF_8)
   private def checkLine[T: Csv](toSer: T, csv: String): Expectations = {
     val result = serialize(toSer)
     expect(result == csv + CsvSerialization.lineDelimiter)

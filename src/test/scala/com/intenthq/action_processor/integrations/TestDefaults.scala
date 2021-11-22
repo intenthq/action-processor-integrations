@@ -18,5 +18,6 @@ object TestDefaults {
 
   val feedFilter: FeedFilter = FeedFilter(None, None)
 
-  def feedContext[F[_]]: FeedContext[F] = FeedContext[F](None, feedFilter, mapDbSettings)
+  def feedContext[F[_]]: FeedContext[F] =
+    FeedContext[F](None, feedFilter, mapDbSettings, None)
 }
