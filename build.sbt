@@ -23,7 +23,10 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "co.fs2" %% "fs2-core" % "3.2.2",
       "co.fs2" %% "fs2-io" % "3.2.2",
-      "com.google.crypto.tink" % "tink" % "1.6.1",
+      "com.google.crypto.tink" % "tink" % "1.6.1" excludeAll(
+        // excluded due to CVE in version used by tink 1.6.1 -> https://github.com/advisories/GHSA-wrvw-hg22-4m67
+        ExclusionRule(organization = "com.google.protobuf"),
+      ),
       "com.softwaremill.magnolia1_2" %% "magnolia" % "1.0.0-M7",
       "de.siegmar" % "fastcsv" % "1.0.3",
       "org.mapdb" % "mapdb" % "3.0.8",
