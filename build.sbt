@@ -30,9 +30,10 @@ lazy val root = (project in file("."))
       "com.softwaremill.magnolia1_2" %% "magnolia" % "1.0.0-M7",
       "de.siegmar" % "fastcsv" % "1.0.3",
       "org.mapdb" % "mapdb" % "3.0.8",
-      "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
-      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC1",
-      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1",
+      "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
+      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
+      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
+      "org.postgresql" % "postgresql" % "42.3.2",
       "com.disneystreaming" %% "weaver-cats" % "0.7.7" % Test,
       "com.disneystreaming" %% "weaver-core" % "0.7.7" % Test,
       "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1" % Test
