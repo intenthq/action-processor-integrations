@@ -16,7 +16,7 @@ object TestDefaults {
     levels = 4
   )
 
-  val feedFilter: FeedFilter = FeedFilter(None, None)
+  val feedFilter: FeedFilter = FeedFilter.empty
 
   def feedContext[F[_]]: FeedContext[F] =
     FeedContext[F](None, feedFilter, mapDbSettings, None)
