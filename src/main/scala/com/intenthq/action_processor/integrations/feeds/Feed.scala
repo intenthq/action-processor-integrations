@@ -11,7 +11,19 @@ trait Feed[I, O] {
 
   def date(feedContext: FeedContext[IO], clock: Clock = Clock.systemDefaultZone()): IO[LocalDate] =
     feedContext.filter.date.fold(IO.delay(java.time.LocalDate.now(clock)))(IO.pure)
-  def part(feedContext: FeedContext[IO]): Int = feedContext.filter.time.fold(0)(_.getHour)
+
+  def part(feedContext: FeedContext[IO]): String = {
+    val timePart = f"${feedContext.filter.time.fold(0)(_.getHour)}%02d"
+    if (feedContext.filter.partition.nonEmpty) {
+      val partitionPart = feedContext.filter.partition.toList
+        .sortBy(_._1)
+        .map(_._2)
+        .mkString("_")
+      s"${partitionPart}_$timePart"
+        .replaceAll("\\W", "_")
+    } else
+      timePart
+  }
 
   def inputStream(feedContext: FeedContext[IO]): fs2.Stream[IO, I]
   def transform(feedContext: FeedContext[IO]): fs2.Pipe[IO, I, O]
