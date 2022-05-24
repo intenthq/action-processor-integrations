@@ -23,7 +23,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "co.fs2" %% "fs2-core" % "3.2.2",
       "co.fs2" %% "fs2-io" % "3.2.2",
-      "com.google.crypto.tink" % "tink" % "1.6.1" excludeAll(
+      "com.google.crypto.tink" % "tink" % "1.6.1" excludeAll (
         // excluded due to CVE in version used by tink 1.6.1 -> https://github.com/advisories/GHSA-wrvw-hg22-4m67
         ExclusionRule(organization = "com.google.protobuf"),
       ),
@@ -34,6 +34,7 @@ lazy val root = (project in file("."))
       "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
       "org.postgresql" % "postgresql" % "42.3.2",
+      "com.google.code.gson" % "gson" % "2.8.9", // overriden because of a vulnerability
       "com.disneystreaming" %% "weaver-cats" % "0.7.7" % Test,
       "com.disneystreaming" %% "weaver-core" % "0.7.7" % Test,
       "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1" % Test
