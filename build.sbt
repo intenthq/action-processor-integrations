@@ -33,7 +33,7 @@ lazy val root = (project in file("."))
       "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
-      "org.postgresql" % "postgresql" % "42.3.2",
+      "org.postgresql" % "postgresql" % "42.4.1",
       "com.google.code.gson" % "gson" % "2.8.9", // overriden because of a vulnerability
       "com.disneystreaming" %% "weaver-cats" % "0.7.7" % Test,
       "com.disneystreaming" %% "weaver-core" % "0.7.7" % Test,
