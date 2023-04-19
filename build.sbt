@@ -6,7 +6,7 @@ ThisBuild / homepage := Some(url("https://github.com/intenthq/action-processor-i
 ThisBuild / developers := List(Developer("intenthq", "Intent HQ", null, url("https://www.intenthq.com/")))
 ThisBuild / licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT")))
 
-ThisBuild / scalaVersion := "2.13.7"
+ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
@@ -33,11 +33,12 @@ lazy val root = (project in file("."))
       "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
       "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
-      "org.postgresql" % "postgresql" % "42.4.1",
+      "org.postgresql" % "postgresql" % "42.4.3", // CVE-2022-41946,  CVE-2022-31197
       "com.google.code.gson" % "gson" % "2.8.9", // overriden because of a vulnerability
       "com.disneystreaming" %% "weaver-cats" % "0.7.7" % Test,
       "com.disneystreaming" %% "weaver-core" % "0.7.7" % Test,
-      "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1" % Test
+      "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1" % Test,
+      "org.jetbrains.kotlin" % "kotlin-stdlib" % "1.6.0" // override to avoid CVE-2022-24329, CVE-2020-29582 vulnerabilities
     ),
     /*
     https://github.com/sbt/sbt/issues/3249#issuecomment-534757714
