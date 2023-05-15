@@ -10,7 +10,7 @@ jobs:
   release-sonatype:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # We need to unshallow to allow git describe work with last tag
           fetch-depth: 0
