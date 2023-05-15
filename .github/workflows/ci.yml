@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           java-version: 8
-      - uses: coursier/cache-action@v5
+      - uses: coursier/cache-action@v6
       - id: test
         name: Test
         env:
