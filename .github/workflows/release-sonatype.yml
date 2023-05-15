@@ -45,7 +45,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         run: sbt ci-release
       - name: Send slack notification
-        uses: act10ns/slack@v1
+        uses: act10ns/slack@v2
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with: 
