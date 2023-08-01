@@ -30,14 +30,14 @@ lazy val root = (project in file("."))
       "com.softwaremill.magnolia1_2" %% "magnolia" % "1.0.0-M7",
       "de.siegmar" % "fastcsv" % "1.0.3",
       "org.mapdb" % "mapdb" % "3.0.8",
-      "org.tpolecat" %% "doobie-core" % "1.0.0-RC2",
-      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC2",
-      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC2",
+      "org.tpolecat" %% "doobie-core" % "1.0.0-RC4",
+      "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC4",
+      "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC4",
       "org.postgresql" % "postgresql" % "42.4.3", // CVE-2022-41946,  CVE-2022-31197
-      "com.google.code.gson" % "gson" % "2.8.9", // overriden because of a vulnerability
+      "com.google.code.gson" % "gson" % "2.8.9", // overridden because of a vulnerability
       "com.disneystreaming" %% "weaver-cats" % "0.7.7" % Test,
       "com.disneystreaming" %% "weaver-core" % "0.7.7" % Test,
-      "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1" % Test,
+      "org.tpolecat" %% "doobie-h2" % "1.0.0-RC4" % Test,
       "org.jetbrains.kotlin" % "kotlin-stdlib" % "1.6.0" // override to avoid CVE-2022-24329, CVE-2020-29582 vulnerabilities
     ),
     /*
