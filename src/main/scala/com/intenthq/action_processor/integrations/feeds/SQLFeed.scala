@@ -15,7 +15,7 @@ trait SQLFeed[I, O] extends Feed[I, O] with DoobieImplicits {
   protected lazy val transactor: Transactor[IO] = createTransactor
   protected val chunkSize: Int = doobie.util.query.DefaultChunkSize
 
-  protected def createTransactor: Aux[IO, Unit] = Transactor.fromDriverManager[IO](driver, jdbcUrl)
+  protected def createTransactor: Aux[IO, Unit] = Transactor.fromDriverManager[IO](driver, jdbcUrl, None)
 
   override def inputStream(feedContext: FeedContext[IO]): fs2.Stream[IO, I] =
     query(feedContext)
