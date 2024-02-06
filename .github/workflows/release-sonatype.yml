@@ -14,10 +14,10 @@ jobs:
         with:
           # We need to unshallow to allow git describe work with last tag
           fetch-depth: 0
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
-          java-version: 8
-          distribution: "adopt"
+          java-version: 11
+          distribution: "temurin"
       - uses: coursier/cache-action@v6
       - id: test
         name: Test
