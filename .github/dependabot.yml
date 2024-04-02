@@ -5,8 +5,8 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: 'Chore: '
+      prefix: 'chore: '
     labels:
       - github_actions
-      - dependencies
+      - dependabot
       - chore
