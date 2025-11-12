@@ -17,6 +17,8 @@ jobs:
           java-version: 11
           distribution: "temurin"
       - uses: coursier/cache-action@v6
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
       - id: test
         name: Test
         env:
