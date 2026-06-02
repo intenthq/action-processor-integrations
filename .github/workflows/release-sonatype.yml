@@ -6,6 +6,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release-sonatype:
     runs-on: ubuntu-latest
@@ -14,6 +17,7 @@ jobs:
         with:
           # We need to unshallow to allow git describe work with last tag
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           java-version: 11
