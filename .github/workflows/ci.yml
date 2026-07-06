@@ -12,13 +12,14 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: actions/setup-java@v4
         with:
-          java-version: 11
+          java-version: 17
           distribution: "temurin"
       - uses: coursier/cache-action@v8
       - name: Setup sbt launcher
