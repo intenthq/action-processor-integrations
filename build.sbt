@@ -4,7 +4,9 @@ ThisBuild / organizationHomepage := Some(url("https://www.intenthq.com/"))
 
 ThisBuild / homepage := Some(url("https://github.com/intenthq/action-processor-integrations"))
 ThisBuild / developers := List(Developer("intenthq", "Intent HQ", null, url("https://www.intenthq.com/")))
-ThisBuild / licenses := Seq(("MIT", url("http://opensource.org/licenses/MIT")))
+ThisBuild / licenses := Seq(
+  ("Proprietary", url("https://github.com/intenthq/action-processor-integrations/blob/master/LICENSE"))
+)
 
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / semanticdbEnabled := true
